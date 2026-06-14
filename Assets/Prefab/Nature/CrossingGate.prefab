@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 5591991150755801514}
   - component: {fileID: 1346550798202503792}
   - component: {fileID: 1590128903399526017}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: CrossingFate
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -124,7 +124,7 @@ GameObject:
   - component: {fileID: 4172694620406352943}
   - component: {fileID: 3664859318250213805}
   - component: {fileID: 151477905418861634}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: CrossingFate
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -236,7 +236,7 @@ GameObject:
   - component: {fileID: 3138934556879515456}
   - component: {fileID: 4417082507084298616}
   - component: {fileID: 7233596968627339197}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: BlackBoard
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -348,7 +348,7 @@ GameObject:
   - component: {fileID: 1854715537239897582}
   - component: {fileID: 4219911029327192902}
   - component: {fileID: 7903139557756187728}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: CrossingFate
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -460,7 +460,7 @@ GameObject:
   - component: {fileID: 2138962873171618240}
   - component: {fileID: 8496325373869726984}
   - component: {fileID: 1735550470951877022}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: CrossingFate
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -572,7 +572,7 @@ GameObject:
   - component: {fileID: 1546543314788095085}
   - component: {fileID: 1409566802382754074}
   - component: {fileID: 8755824489199144154}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: CrossingFate
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -684,7 +684,7 @@ GameObject:
   - component: {fileID: 8498243868901076491}
   - component: {fileID: 3852481120399428302}
   - component: {fileID: 7364543562525850274}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Red2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -793,8 +793,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2712655843984662780}
-  - component: {fileID: 8038184113774828342}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: CrossingGate
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -829,28 +828,6 @@ Transform:
   - {fileID: 6719513909194889077}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!95 &8038184113774828342
-Animator:
-  serializedVersion: 7
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5801956593719146176}
-  m_Enabled: 1
-  m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: ff3d92aeb3296094394fe79bc7e385dc, type: 2}
-  m_CullingMode: 0
-  m_UpdateMode: 0
-  m_ApplyRootMotion: 0
-  m_LinearVelocityBlending: 0
-  m_StabilizeFeet: 0
-  m_AnimatePhysics: 0
-  m_WarningMessage: 
-  m_HasTransformHierarchy: 1
-  m_AllowConstantClipSamplingOptimization: 1
-  m_KeepAnimatorStateOnDisable: 0
-  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &6480629301274871558
 GameObject:
   m_ObjectHideFlags: 0
@@ -863,7 +840,7 @@ GameObject:
   - component: {fileID: 5309562214401844919}
   - component: {fileID: 5193072961202075964}
   - component: {fileID: 3056539425819061773}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: CrossingFate
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -975,7 +952,7 @@ GameObject:
   - component: {fileID: 6572621971349871111}
   - component: {fileID: 464592885947718134}
   - component: {fileID: 4821130806010666516}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: CrossingFate
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1087,7 +1064,7 @@ GameObject:
   - component: {fileID: 4875145499774302666}
   - component: {fileID: 5591206533122344277}
   - component: {fileID: 1493638963123956109}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: CrossingFate
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1199,7 +1176,7 @@ GameObject:
   - component: {fileID: 7042838818935311171}
   - component: {fileID: 1231956925060990287}
   - component: {fileID: 6405928785175921798}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: CrossingFate
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1311,7 +1288,7 @@ GameObject:
   - component: {fileID: 4904118497776968760}
   - component: {fileID: 2767400645985363676}
   - component: {fileID: 1510728217051300621}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Red1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1423,7 +1400,7 @@ GameObject:
   - component: {fileID: 3239266896527362386}
   - component: {fileID: 3422081697112420867}
   - component: {fileID: 2394106439580608243}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: CrossingFate
   m_TagString: Untagged
   m_Icon: {fileID: 0}

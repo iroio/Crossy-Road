@@ -32,9 +32,19 @@ public class PlayerController : MonoBehaviour
     Vector3 _mDir;
 
     // =========================================================
+    // Raycast 옵션
+    // =========================================================
+    float _maxDistance = 3f;
+
+    // =========================================================
     // 상태 체크
     // =========================================================
     bool _isMoving = false;
+
+    // =========================================================
+    // 레이어 확인
+    // =========================================================
+    int _layerMask;
 
     // =========================================================
     // 스와이프 체크
@@ -69,7 +79,9 @@ public class PlayerController : MonoBehaviour
 
         if (delta.magnitude < _minSwipeDistance)
         {
-            StartCoroutine(CharJump(Vector3.forward));
+            if (!IsObstacle(Vector3.forward))
+                StartCoroutine(CharJump(Vector3.forward));
+
             return;
         }
 
@@ -79,20 +91,29 @@ public class PlayerController : MonoBehaviour
         {
             // 앞뒤
             if (_mDir.y > 0)
-                StartCoroutine(CharJump(Vector3.forward));
+            {
+                if (!IsObstacle(Vector3.forward))
+                    StartCoroutine(CharJump(Vector3.forward));
+
+            }
             else
-                StartCoroutine(CharJump(Vector3.back));
+            {
+                if (!IsObstacle(Vector3.back))
+                    StartCoroutine(CharJump(Vector3.back));
+            }
         }
         else
         {
             //좌우
             if (_mDir.x > 0)
             {
-                StartCoroutine(CharJump(Vector3.right));
+                if (!IsObstacle(Vector3.right))
+                    StartCoroutine(CharJump(Vector3.right));
             }
             else
             {
-                StartCoroutine(CharJump(Vector3.left));
+                if (!IsObstacle(Vector3.left))
+                    StartCoroutine(CharJump(Vector3.left));
             }
         }
     }
@@ -100,14 +121,17 @@ public class PlayerController : MonoBehaviour
     // =========================================================
     // 장애물 여부 확인
     // ========================================================= 
-    //public bool IsObstacle()
-    //{
-    //    Ray ray = new Ray(transform.position, transform.forward);
-    //    RaycastHit hit;
-    //    if(Physics.Raycast(ray, out hit, _maxDistance, _layerMask))
+    public bool IsObstacle(Vector3 dir)
+    {
+        Vector3 origin = transform.position;
+        RaycastHit hit;
 
-    //    return false;
-    //}
+        if (Physics.Raycast(origin, dir, out hit, _maxDistance, _layerMask)) 
+        { 
+            return true;
+        }
+        return false;
+    }
 
     // =========================================================
     // 점프 처리
@@ -170,7 +194,7 @@ public class PlayerController : MonoBehaviour
     // =========================================================
     void Start()
     {
-
+        _layerMask = LayerMask.GetMask("Obstacle");
     }
 
     // =========================================================
@@ -178,8 +202,12 @@ public class PlayerController : MonoBehaviour
     // =========================================================
     void Update()
     {
-        //if (IsObstacle()) return;
         SwipeCheck();
+
+        Debug.DrawRay(transform.position, Vector3.forward * _maxDistance, Color.red);
+        Debug.DrawRay(transform.position, Vector3.back * _maxDistance, Color.red);
+        Debug.DrawRay(transform.position, Vector3.right * _maxDistance, Color.red);
+        Debug.DrawRay(transform.position, Vector3.left * _maxDistance, Color.red);
 
         // 플레이어 점프 준비 동작
         if (Mouse.current.leftButton.IsPressed())
