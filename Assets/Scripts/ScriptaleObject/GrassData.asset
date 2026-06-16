@@ -10,10 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9413d62129e759b4c8f67e4db0891fab, type: 3}
-  m_Name: LightGrassData
+  m_Name: GrassData
   m_EditorClassIdentifier: Assembly-CSharp::RowData
   rowType: 0
-  prefab: {fileID: 6605098234722757372, guid: 671cb6f2ec9a8ab4282e0c43e9a96251, type: 3}
+  prefab: {fileID: 0}
   weight: 50
   minRepeat: 1
   maxRepeat: 3

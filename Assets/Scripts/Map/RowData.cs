@@ -2,8 +2,7 @@ using UnityEngine;
 
 public enum RowType
 {
-    LightGrass,
-    DarkGrass,
+    Grass,
     Road,
     Rail,
     River

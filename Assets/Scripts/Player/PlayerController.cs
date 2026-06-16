@@ -80,7 +80,10 @@ public class PlayerController : MonoBehaviour
         if (delta.magnitude < _minSwipeDistance)
         {
             if (!IsObstacle(Vector3.forward))
-                StartCoroutine(CharJump(Vector3.forward));
+            {
+                StartCoroutine(CoCharJump(Vector3.forward));
+                StartCoroutine(CoRotation(0));
+            }
 
             return;
         }
@@ -93,13 +96,17 @@ public class PlayerController : MonoBehaviour
             if (_mDir.y > 0)
             {
                 if (!IsObstacle(Vector3.forward))
-                    StartCoroutine(CharJump(Vector3.forward));
-
+                {
+                    StartCoroutine(CoCharJump(Vector3.forward));
+                }
             }
             else
             {
                 if (!IsObstacle(Vector3.back))
-                    StartCoroutine(CharJump(Vector3.back));
+                {
+                    StartCoroutine(CoCharJump(Vector3.back));
+                    StartCoroutine(CoRotation(180));
+                }
             }
         }
         else
@@ -108,14 +115,44 @@ public class PlayerController : MonoBehaviour
             if (_mDir.x > 0)
             {
                 if (!IsObstacle(Vector3.right))
-                    StartCoroutine(CharJump(Vector3.right));
+                {
+                    StartCoroutine(CoCharJump(Vector3.right));
+                    StartCoroutine(CoRotation(90));
+                }                    
             }
             else
             {
                 if (!IsObstacle(Vector3.left))
-                    StartCoroutine(CharJump(Vector3.left));
+                {
+                    StartCoroutine(CoCharJump(Vector3.left));
+                    StartCoroutine(CoRotation(-90));
+                }
             }
         }
+    }
+
+    // =========================================================
+    // 플레이어 회전
+    // ========================================================= 
+    IEnumerator CoRotation(float target)
+    {
+        Quaternion startRot = transform.rotation;
+        Quaternion targetRot = Quaternion.Euler(0, target, 0);
+
+        float time = 0f;
+        float duration = 0.2f;
+
+        while (time < duration)
+        {
+            time += Time.deltaTime;
+
+            float t = time / duration;
+
+            transform.rotation = Quaternion.Slerp(startRot, targetRot, t);
+
+            yield return null;
+        }
+        transform.rotation = targetRot;
     }
 
     // =========================================================
@@ -136,7 +173,7 @@ public class PlayerController : MonoBehaviour
     // =========================================================
     // 점프 처리
     // ========================================================= 
-    IEnumerator CharJump(Vector3 dir)
+    IEnumerator CoCharJump(Vector3 dir)
     {
         _isMoving = true;
 
@@ -203,11 +240,6 @@ public class PlayerController : MonoBehaviour
     void Update()
     {
         SwipeCheck();
-
-        Debug.DrawRay(transform.position, Vector3.forward * _maxDistance, Color.red);
-        Debug.DrawRay(transform.position, Vector3.back * _maxDistance, Color.red);
-        Debug.DrawRay(transform.position, Vector3.right * _maxDistance, Color.red);
-        Debug.DrawRay(transform.position, Vector3.left * _maxDistance, Color.red);
 
         // 플레이어 점프 준비 동작
         if (Mouse.current.leftButton.IsPressed())
