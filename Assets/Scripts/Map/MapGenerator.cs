@@ -14,9 +14,9 @@ public class MapGenerator : MonoBehaviour
 
     [SerializeField]  List<RowData> _rowDatas;
 
-    [SerializeField] int _startRowCount = 20;
-
     int _currentZ = 2;
+
+    public int CurrentZ => _currentZ;
 
     // =========================================================
     // 각 행 가중치 계산
@@ -68,12 +68,15 @@ public class MapGenerator : MonoBehaviour
     // =========================================================
     // 행 생성
     // =========================================================
-    public void SpawnRow()
+    public List<GameObject> SpawnRow()
     {
+        // 반환할 리스트 변수
+        List<GameObject> spawnedRows = new List<GameObject>();
+
         // 가중치를 이용해 행 한줄 선택
         RowData row = GetRandomRow();
 
-        if (row == null) return;
+        if (row == null) return spawnedRows;
 
         // minRepeat ~ maxRepeat + 1 에서 하나의 숫자 선택
         // maxRepeat 바로 이전 숫까까지 중에 선택하므로 maxRepeat + 1
@@ -100,25 +103,14 @@ public class MapGenerator : MonoBehaviour
             }
 
             // 행 생성
-            Instantiate(prefabToSpawn, new Vector3(0, 0, _currentZ), Quaternion.identity);
+            GameObject newRow =  Instantiate(prefabToSpawn, new Vector3(0, 0, _currentZ), Quaternion.identity);
+
+            spawnedRows.Add(newRow);
 
             // 생성 행 위치 2칸 증가
             _currentZ += 2;
         }
-    }
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-        while(_currentZ<_startRowCount * 2)
-        {
-            SpawnRow();
-        }
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
+        return spawnedRows;
     }
 }
