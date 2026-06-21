@@ -5,6 +5,7 @@ using UnityEngine.ProBuilder.Shapes;
 
 public class CarGenerator : MonoBehaviour
 {
+    [SerializeField] Transform _root;
     [SerializeField] Transform[] _spawnPoints;
     [SerializeField] List<GameObject> _cars = new List<GameObject>();
 
@@ -43,7 +44,7 @@ public class CarGenerator : MonoBehaviour
 
             SpawnCar(angle);
 
-            _spawnDelay = Random.Range(2, 7);
+            _spawnDelay = Random.Range(2f, 5f);
             yield return new WaitForSeconds(_spawnDelay);
         }
     }
@@ -55,7 +56,7 @@ public class CarGenerator : MonoBehaviour
         {
             var prefab = _cars[Random.Range(0, _cars.Count)];
 
-            var obj = Instantiate(prefab);
+            var obj = Instantiate(prefab, _root);
             obj.SetActive(false);
 
             var car = obj.GetComponent<CarMovement>();

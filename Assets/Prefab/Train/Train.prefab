@@ -420,6 +420,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TrainMovement
   _speed: 90
+  _resetRange: 100
 --- !u!1 &6662176220538010203
 GameObject:
   m_ObjectHideFlags: 0

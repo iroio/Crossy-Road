@@ -1,41 +1,72 @@
 using System.Collections;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 public class CrossingGateMovement : MonoBehaviour
 { 
-    TrainGenerator _trainGenerator;
+    [SerializeField] TrainGenerator _trainGenerator;
+
+    Coroutine _corail;
+
     Animator _animator;
 
-    float _idleTime;
-    float _spawnDelay;
+    Vector3 _newPos;
 
-    IEnumerator CoAnimationStart()
+    float _idleTime;
+
+    int _randomX;
+
+    bool _isEnd;
+
+    public void AnimEnd()
     {
-        while(true)
+        _isEnd = true;
+    }
+
+    IEnumerator CoRail()
+    {
+
+        while (true)
         {
-            _animator.SetBool("isActive", true);
+            _isEnd = false;
+
+            _idleTime = Random.Range(5f, 10f);
+
             yield return new WaitForSeconds(_idleTime);
+
+            _animator.SetBool("isActive", true);
+
+            yield return new WaitUntil(() => _isEnd);
 
             _animator.SetBool("isActive", false);
-            yield return new WaitForSeconds(_idleTime);
+
+            _trainGenerator.SpawnTrain();
+
+            yield return new WaitUntil(() =>  _trainGenerator.CurrentTrain == null);
         }
     }
 
-    IEnumerator CoEnimCrossingGate()
+    public void SetPosition()
     {
-        while (true)
-        {
-            _trainGenerator.SpawnTrain();
+        _randomX = Random.Range(-9, 6);
 
-            _spawnDelay = Random.Range(0f, 2f);
-            yield return new WaitForSeconds(_spawnDelay);
-        }
+        _newPos = new Vector3(_randomX, 0f, transform.position.z);
+
+        transform.position = _newPos;
     }
 
     void Start()
-    {
+    { 
         _animator = GetComponent<Animator>();
 
-        StartCoroutine(CoAnimationStart());
+        SetPosition();
+
+        if(_corail == null)
+            _corail = StartCoroutine(CoRail());
+    }
+
+    void OnDestroy()
+    {
+        StopAllCoroutines();
     }
 }
