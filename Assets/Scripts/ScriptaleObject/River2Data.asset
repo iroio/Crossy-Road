@@ -10,10 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9413d62129e759b4c8f67e4db0891fab, type: 3}
-  m_Name: RiverDate
+  m_Name: River2Data
   m_EditorClassIdentifier: Assembly-CSharp::RowData
   rowType: 3
-  prefab: {fileID: 3969358149219813902, guid: 31788b9dcb044db40a08fc033c93e5d2, type: 3}
+  prefab: {fileID: 3969358149219813902, guid: f607daee3b930e144b22dc2334511879, type: 3}
   weight: 20
   minRepeat: 1
   maxRepeat: 2

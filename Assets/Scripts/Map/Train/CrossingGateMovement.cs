@@ -18,11 +18,17 @@ public class CrossingGateMovement : MonoBehaviour
 
     bool _isEnd;
 
+    // =========================================================
+    // 애니메이션 종료
+    // =========================================================
     public void AnimEnd()
     {
         _isEnd = true;
     }
 
+    // =========================================================
+    // 차단기 애니메이션 종료 후 기차 생성 로직
+    // =========================================================
     IEnumerator CoRail()
     {
 
@@ -36,16 +42,21 @@ public class CrossingGateMovement : MonoBehaviour
 
             _animator.SetBool("isActive", true);
 
+            // _isEnd가 True일 때 까지 기다리기
             yield return new WaitUntil(() => _isEnd);
 
             _animator.SetBool("isActive", false);
 
             _trainGenerator.SpawnTrain();
 
+            // _trainGenerator.CurrentTrain이 True일 때 까지 기다리기
             yield return new WaitUntil(() =>  _trainGenerator.CurrentTrain == null);
         }
     }
 
+    // =========================================================
+    // 생성 위치 설정
+    // =========================================================
     public void SetPosition()
     {
         _randomX = Random.Range(-9, 6);
@@ -55,6 +66,9 @@ public class CrossingGateMovement : MonoBehaviour
         transform.position = _newPos;
     }
 
+    // =========================================================
+    // Start
+    // =========================================================
     void Start()
     { 
         _animator = GetComponent<Animator>();
@@ -65,6 +79,9 @@ public class CrossingGateMovement : MonoBehaviour
             _corail = StartCoroutine(CoRail());
     }
 
+    // =========================================================
+    // 이 오브젝트가 삭제되면
+    // =========================================================
     void OnDestroy()
     {
         StopAllCoroutines();

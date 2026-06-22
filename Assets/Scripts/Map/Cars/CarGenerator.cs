@@ -9,6 +9,10 @@ public class CarGenerator : MonoBehaviour
     [SerializeField] Transform[] _spawnPoints;
     [SerializeField] List<GameObject> _cars = new List<GameObject>();
 
+    [Header("Spawn Delay min-max")]
+    [SerializeField] float _min = 2f;
+    [SerializeField] float _max = 5f;
+
     Transform _randomPoint;
 
     GameObjectPool<CarMovement> _carsPools;
@@ -17,6 +21,9 @@ public class CarGenerator : MonoBehaviour
 
     bool _isLeft;
 
+    // =========================================================
+    // 자동차 프리팹 생성
+    // =========================================================
     public void SpawnCar(float angle)
     {
         var car = _carsPools.Get();
@@ -29,13 +36,19 @@ public class CarGenerator : MonoBehaviour
         car.gameObject.SetActive(true);
     }
 
-    public void ReturnCar(CarMovement car)
+    // =========================================================
+    // 자동차 제거
+    // =========================================================
+    public void RemoveCar(CarMovement car)
     {
         car.gameObject.SetActive(false);
         car.transform.rotation = Quaternion.identity;
         _carsPools.Set(car);
     }
 
+    // =========================================================
+    // 자동차를 월드에 생성
+    // =========================================================
     IEnumerator CoSpawnCars()
     {
         while (true)
@@ -44,14 +57,17 @@ public class CarGenerator : MonoBehaviour
 
             SpawnCar(angle);
 
-            _spawnDelay = Random.Range(2f, 5f);
+            _spawnDelay = Random.Range(_min, _max);
             yield return new WaitForSeconds(_spawnDelay);
         }
     }
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
+    // =========================================================
+    // Start
+    // =========================================================
     void Start()
     {
+        // Pooling
         _carsPools = new GameObjectPool<CarMovement>(12, () =>
         {
             var prefab = _cars[Random.Range(0, _cars.Count)];

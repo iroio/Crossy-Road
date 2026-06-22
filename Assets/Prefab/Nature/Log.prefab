@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 4008689216762746579}
   - component: {fileID: 3873476060669239532}
   m_Layer: 0
-  m_Name: Pipe
+  m_Name: Log
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -29,13 +29,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 663442148057865060}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.2762886, y: -0.2762886, z: 0.65089524, w: 0.65089524}
-  m_LocalPosition: {x: 0, y: 0, z: 5.57}
+  m_LocalRotation: {x: 0.6532815, y: 0.27059805, z: 0.27059805, w: 0.6532815}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 7585374232840379126}
-  m_LocalEulerAnglesHint: {x: 46, y: 0, z: 90}
+  m_LocalEulerAnglesHint: {x: 45, y: 90, z: 90}
 --- !u!114 &228221972649737302
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -55,12 +55,12 @@ MonoBehaviour:
     m_Uv:
       m_UseWorldSpace: 0
       m_FlipU: 0
-      m_FlipV: 0
+      m_FlipV: 1
       m_SwapUV: 0
       m_Fill: 1
       m_Scale: {x: 1, y: 1}
-      m_Offset: {x: 0, y: 0}
-      m_Rotation: 0
+      m_Offset: {x: 4, y: 0}
+      m_Rotation: 90
       m_Anchor: 9
     m_Material: {fileID: 0}
     m_SubmeshIndex: 0
@@ -406,10 +406,10 @@ MonoBehaviour:
   - {x: 0.39999998, y: 2, z: 0}
   - {x: 0.000000004769952, y: 2, z: -0.39999998}
   m_Textures0:
-  - {x: 0.4596194, y: -2}
-  - {x: -0.45961937, y: -2}
-  - {x: 0.4596194, y: 2}
-  - {x: -0.45961937, y: 2}
+  - {x: -6, y: 0.4596193}
+  - {x: -6, y: -0.4596195}
+  - {x: -2, y: 0.45961946}
+  - {x: -2, y: -0.45961934}
   - {x: 0.28284273, y: -2}
   - {x: -0.2828427, y: -2}
   - {x: 0.28284273, y: 2}
@@ -473,10 +473,10 @@ MonoBehaviour:
   m_Textures2: []
   m_Textures3: []
   m_Tangents:
-  - {x: -1, y: 0, z: 0, w: -1}
-  - {x: 0, y: 0, z: 1, w: -1}
-  - {x: -1, y: 0, z: 0, w: -1}
-  - {x: 0, y: 0, z: 1, w: -1}
+  - {x: 0.000000026341779, y: 1, z: 1.7763568e-15, w: 1}
+  - {x: 0, y: 1, z: -0.00000002634178, w: 1}
+  - {x: 0.000000026341779, y: 1, z: 1.7763568e-15, w: 1}
+  - {x: 0, y: 1, z: -0.00000002634178, w: 1}
   - {x: 0, y: 0, z: -1, w: -1}
   - {x: 1, y: 0, z: 0.00000008429369, w: -1}
   - {x: 0, y: 0, z: -1, w: -1}
@@ -546,7 +546,7 @@ MonoBehaviour:
   m_PreserveMeshAssetOnDestroy: 0
   assetGuid: 
   m_Mesh: {fileID: 0}
-  m_VersionIndex: 1636
+  m_VersionIndex: 1746
   m_IsSelectable: 1
   m_SelectedFaces: 
   m_SelectedEdges: []
@@ -604,7 +604,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: c22777d6e868e4f2fb421913386b154e, type: 2}
+  - {fileID: 2100000, guid: a7ca9b7c97edcd94eb1432d55587b762, type: 2}
   - {fileID: 2100000, guid: 50b71b95efad9c145865c8f975ed637a, type: 2}
   - {fileID: 2100000, guid: a7ca9b7c97edcd94eb1432d55587b762, type: 2}
   - {fileID: 2100000, guid: ffe6210802f820141a77b122cc46769f, type: 2}
@@ -620,7 +620,7 @@ MeshRenderer:
   m_IgnoreNormalsForChartDetection: 0
   m_ImportantGI: 0
   m_StitchLightmapSeams: 1
-  m_SelectedEditorRenderState: 3
+  m_SelectedEditorRenderState: 2
   m_MinimumChartSize: 4
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
@@ -670,8 +670,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7585374232840379126}
+  - component: {fileID: 7006478711418983053}
   m_Layer: 0
-  m_Name: Log_long
+  m_Name: Log
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -693,3 +694,20 @@ Transform:
   - {fileID: 5390250737350881797}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &7006478711418983053
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4447641262988372024}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c8faf1c63d54b87409519ae5c13aaafb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LogMovement
+  _resetRange: 30
+  _speed: 0
+  _startSpeed: 7
+  _min: 3
+  _max: 4

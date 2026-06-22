@@ -290,7 +290,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CameraTargetController
   _player: {fileID: 656733898}
-  _speed: 1.2
+  _speed: 1
 --- !u!4 &235303247
 Transform:
   m_ObjectHideFlags: 0
@@ -966,6 +966,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 4dd49f7ce8d284848ac76c4cdc63dbb8, type: 2}
   - {fileID: 11400000, guid: fb9035b100c3f5345b1e9e0b1496af0d, type: 2}
   - {fileID: 11400000, guid: d4fb01b11bc6c0a45a1837cd0e7ed2a5, type: 2}
+  - {fileID: 11400000, guid: 2ca1bc87500d31843969a8f8733d8223, type: 2}
 --- !u!4 &718734847
 Transform:
   m_ObjectHideFlags: 0

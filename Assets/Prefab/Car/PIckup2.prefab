@@ -319,7 +319,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c11b5172d6f57ff4c9272119e733c52d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CarMovement
+  _resetRange: 30
   _speed: 8
+  _min: 5
+  _max: 6
 --- !u!1 &7413533920482389902
 GameObject:
   m_ObjectHideFlags: 0

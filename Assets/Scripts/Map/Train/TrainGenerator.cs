@@ -13,6 +13,9 @@ public class TrainGenerator : MonoBehaviour
 
     public Transform CurrentTrain => _currentTrain;
 
+    // =========================================================
+    // 기차 생성
+    // =========================================================
     public void SpawnTrain()
     {
         if (_train == null) return;
@@ -20,15 +23,16 @@ public class TrainGenerator : MonoBehaviour
 
         float angle = _randomPoint == _spawnPoints[0] ? 90f : -90f;
 
-        if (_randomPoint == null)
-        {
-            return;
-        }
+        if (_randomPoint == null) return;
+
         _currentTrain = Instantiate(_train, _randomPoint.position, Quaternion.Euler(0f, angle, 0f));
 
         _currentTrain.GetComponent<TrainMovement>().InitTrain(this);
     }
 
+    // =========================================================
+    // 기차 삭제
+    // =========================================================
     public void RemoveTrain()
     {
         if (_currentTrain == null)  return;
@@ -37,7 +41,9 @@ public class TrainGenerator : MonoBehaviour
         _currentTrain = null;
     }
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
+    // =========================================================
+    // Awake
+    // =========================================================
     void Awake()
     {
         _isLeft = Random.value > 0.5f;

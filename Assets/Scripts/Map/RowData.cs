@@ -5,7 +5,8 @@ public enum RowType
     Grass,
     Road,
     Rail,
-    River
+    River1,
+    River2
 }
 
 [CreateAssetMenu(menuName = "Map/Row Data")]
