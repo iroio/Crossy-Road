@@ -50,4 +50,9 @@ public class TrainGenerator : MonoBehaviour
 
         _randomPoint = _isLeft ? _spawnPoints[0] : _spawnPoints[1];
     }
+
+    void OnDestroy()
+    {
+        RemoveTrain();
+    }
 }

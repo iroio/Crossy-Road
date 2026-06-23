@@ -28,8 +28,8 @@ Transform:
   m_GameObject: {fileID: 858920628207592067}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0, y: 0.06, z: -0.474}
-  m_LocalScale: {x: 0.3, y: 0.1, z: 1.0876}
+  m_LocalPosition: {x: -0, y: 0.06, z: -0.4541}
+  m_LocalScale: {x: 0.3, y: 0.1, z: 1.1272881}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 6934679104778642856}
@@ -140,8 +140,8 @@ Transform:
   m_GameObject: {fileID: 1110544271715245575}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.1, y: 0, z: -0.17}
-  m_LocalScale: {x: 1.2, y: 0.2, z: 1.7}
+  m_LocalPosition: {x: -0.0158, y: -0, z: -0.2679}
+  m_LocalScale: {x: 1.03164, y: 0.2, z: 1.5042578}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 6934679104778642856}
@@ -233,6 +233,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7986399416980639768}
+  - component: {fileID: 7673033240254947158}
   m_Layer: 0
   m_Name: Lotus
   m_TagString: Untagged
@@ -256,6 +257,20 @@ Transform:
   - {fileID: 6934679104778642856}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &7673033240254947158
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2090306605897589277}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 231841dd1c9b64b4ba2e0823a609a8cb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LotusMovement
+  _angle: 30
+  _speed: 10
 --- !u!1 &3755880739845169270
 GameObject:
   m_ObjectHideFlags: 0
@@ -265,7 +280,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6934679104778642856}
-  - component: {fileID: 6243494023046494193}
   m_Layer: 0
   m_Name: Lotus
   m_TagString: Untagged
@@ -282,7 +296,7 @@ Transform:
   m_GameObject: {fileID: 3755880739845169270}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: -0.224, y: 0, z: 0.236}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -292,18 +306,6 @@ Transform:
   - {fileID: 9003283979506516376}
   m_Father: {fileID: 7986399416980639768}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &6243494023046494193
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3755880739845169270}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 231841dd1c9b64b4ba2e0823a609a8cb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::LotusMovement
 --- !u!1 &4034584796531773350
 GameObject:
   m_ObjectHideFlags: 0
@@ -332,8 +334,8 @@ Transform:
   m_GameObject: {fileID: 4034584796531773350}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.75, y: 0, z: 0.08}
-  m_LocalScale: {x: 0.5, y: 0.2, z: 1.2}
+  m_LocalPosition: {x: 0.75, y: 0, z: -0.0182}
+  m_LocalScale: {x: 0.5, y: 0.2, z: 1.0034764}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 6934679104778642856}
@@ -444,7 +446,7 @@ Transform:
   m_GameObject: {fileID: 8444160980102614787}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: 0.7071068, z: -0, w: 0.7071068}
-  m_LocalPosition: {x: 0.499, y: 0.059999995, z: -0.08099985}
+  m_LocalPosition: {x: 0.499, y: 0.059999995, z: -0.042}
   m_LocalScale: {x: 0.3, y: 0.1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

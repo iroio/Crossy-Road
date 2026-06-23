@@ -45,7 +45,7 @@ public class LogGenerator : MonoBehaviour
     }
 
     // =========================================================
-    // 통나무를 월드에 생성
+    // 통나무 생성
     // =========================================================
     IEnumerator CoSpawnLog()
     {
@@ -67,7 +67,7 @@ public class LogGenerator : MonoBehaviour
     {
         _logsPools = new GameObjectPool<LogMovement>(5, () =>
         {
-            var obj = Instantiate(_log);
+            var obj = Instantiate(_log, _root);
             obj.SetActive(false);
 
             var log = obj.GetComponent<LogMovement>();
@@ -76,7 +76,7 @@ public class LogGenerator : MonoBehaviour
             return log;
         });
 
-        _isLeft = Random.value > 0.5f;
+        _isLeft = Random.Range(0, 2) == 0;
 
         _randomPoint = _isLeft ? _spawnPoints[0] : _spawnPoints[1];
 

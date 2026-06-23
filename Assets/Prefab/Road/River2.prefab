@@ -9993,7 +9993,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: df12adc098df2744f8a131cae740dc62, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LotusGenerator
-  _lotus: {fileID: 7986399416980639768, guid: 21e5aebb947fff44bb14ec4658348534, type: 3}
+  _root: {fileID: 5518006457024689987}
+  _lotus: {fileID: 2090306605897589277, guid: 21e5aebb947fff44bb14ec4658348534, type: 3}
+  _min: -9
+  _max: 9
+  _size: 2
+  _lotusMin: 1
+  _lotusMax: 3
 --- !u!1 &8628563133751975635
 GameObject:
   m_ObjectHideFlags: 0

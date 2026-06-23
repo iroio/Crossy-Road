@@ -13,8 +13,6 @@ public class LogMovement : MonoBehaviour
     [SerializeField] float _min = 2f;
     [SerializeField] float _max = 4f;
 
-
-
     // =========================================================
     // √ ±‚»≠
     // =========================================================
@@ -36,7 +34,7 @@ public class LogMovement : MonoBehaviour
     // =========================================================
     void Update()
     {
-        if (transform.position.x <= -10f || transform.position.x >= 10)
+        if (transform.position.x <= -9f || transform.position.x >= 9)
         {
             transform.position += transform.forward * _startSpeed * Time.deltaTime;
         }

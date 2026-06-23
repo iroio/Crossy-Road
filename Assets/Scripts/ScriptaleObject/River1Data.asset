@@ -14,6 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::RowData
   rowType: 3
   prefab: {fileID: 3969358149219813902, guid: 31788b9dcb044db40a08fc033c93e5d2, type: 3}
-  weight: 20
+  weight: 28
   minRepeat: 1
   maxRepeat: 2

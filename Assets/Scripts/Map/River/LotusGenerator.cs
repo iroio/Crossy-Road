@@ -1,27 +1,32 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.ProBuilder.Shapes;
 
 public class LotusGenerator : MonoBehaviour
 {
+    [SerializeField] Transform _root;
     [SerializeField] GameObject _lotus;
 
-    Transform _randomPoint;
+    [Header("Lotus Spawn Count min-max")]
+    [SerializeField] int _lotusMin = 1;
+    [SerializeField] int _lotusMax = 4;
 
-    int _randomSpawnPointX;
+    int _randomCount;
 
     GameObjectPool<LotusMovement> _lotusPools;
+    List<int> _lotusPos = new List<int>();
 
     // =========================================================
     // 연꽃잎 프리팹 생성
     // =========================================================
-    public void SpawnLotus(float angle)
+    public void SpawnLotus(float angle, int x)
     {
         var lotus = _lotusPools.Get();
 
         if (lotus == null) return;
 
-        lotus.transform.position = _randomPoint.position;
+        lotus.transform.position = new Vector3(x, 0f, transform.position.z);
         lotus.transform.rotation = Quaternion.Euler(0f, angle, 0f);
 
         lotus.gameObject.SetActive(true);
@@ -30,7 +35,7 @@ public class LotusGenerator : MonoBehaviour
     // =========================================================
     // 연꽃잎 제거
     // =========================================================
-    public void RemoveLog(LotusMovement lotus)
+    public void RemoveLotus(LotusMovement lotus)
     {
         lotus.gameObject.SetActive(false);
         lotus.transform.rotation = Quaternion.identity;
@@ -38,15 +43,30 @@ public class LotusGenerator : MonoBehaviour
     }
 
     // =========================================================
-    // 통나무를 월드에 생성
+    // 연꽃잎 생성
     // =========================================================
-    IEnumerator CoSpawnLog()
+    void SpawnLotusGropu()
     {
-        while (true)
-        {
-            SpawnLotus();
+        float angle = Random.Range(0, 360f);
+        _randomCount = Random.Range(_lotusMin, _lotusMax + 1);
 
-            yield return null;
+        // spawn 가능한 위치 초기화
+        _lotusPos.Clear();
+
+        for (int x = -8; x <= 8; x += 2) 
+        {
+            _lotusPos.Add(x);
+        }
+
+        // 중복 없이 랜덤한 위치 선택
+        for (int i = 0; i < _randomCount; i++)
+        {
+            int index = Random.Range(0, _lotusPos.Count);
+            int randomX = _lotusPos[index];
+
+            _lotusPos.RemoveAt(index);
+
+            SpawnLotus(angle, randomX);
         }
     }
 
@@ -55,12 +75,9 @@ public class LotusGenerator : MonoBehaviour
     // =========================================================
     void Start()
     {
-        _randomSpawnPointX = Random.Range(-8, 9);
-
-
         _lotusPools = new GameObjectPool<LotusMovement>(3, () =>
         {
-            var obj = Instantiate(_lotus);
+            var obj = Instantiate(_lotus, _root);
             obj.SetActive(false);
 
             var lotus = obj.GetComponent<LotusMovement>();
@@ -68,5 +85,7 @@ public class LotusGenerator : MonoBehaviour
 
             return lotus;
         });
+
+        SpawnLotusGropu();
     }
 }
