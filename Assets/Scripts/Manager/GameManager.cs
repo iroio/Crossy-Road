@@ -9,6 +9,8 @@ public class GameManager : MonoBehaviour
     bool _isGameOver;
     bool _isPlaying;
 
+    public bool IsGameOver => _isGameOver;
+
     public void AddScore(int score)
     {
         _score += score;

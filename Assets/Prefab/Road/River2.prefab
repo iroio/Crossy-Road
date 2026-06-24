@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5518006457024689987}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Root
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -42,7 +42,7 @@ GameObject:
   - component: {fileID: 4515909910370496294}
   - component: {fileID: 6469075799368619669}
   - component: {fileID: 6185903943207685854}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Particle Right
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4876,7 +4876,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3084601777107292832}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Left
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4907,7 +4907,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3962412960186751905}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: ========== Logs =========
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4938,7 +4938,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 9108711684061035379}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: River2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4972,7 +4972,7 @@ GameObject:
   - component: {fileID: 8938960598431493844}
   - component: {fileID: 7172679614146555068}
   - component: {fileID: 6409566838908305552}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Particle Left
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -9806,7 +9806,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3472090108221850361}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Right
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -9840,7 +9840,7 @@ GameObject:
   - component: {fileID: 4396175164088480803}
   - component: {fileID: 6362418384316551260}
   - component: {fileID: 3668150664442137483}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: River
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -9952,7 +9952,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4116665429559449780}
   - component: {fileID: 6420779762148762362}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: River
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -9995,9 +9995,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::LotusGenerator
   _root: {fileID: 5518006457024689987}
   _lotus: {fileID: 2090306605897589277, guid: 21e5aebb947fff44bb14ec4658348534, type: 3}
-  _min: -9
-  _max: 9
-  _size: 2
   _lotusMin: 1
   _lotusMax: 3
 --- !u!1 &8628563133751975635
@@ -10009,7 +10006,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3077683866160875619}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: ========== Looks ================
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -10040,7 +10037,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4924502965011028790}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: ========== CarSpawnPoint =========
   m_TagString: Untagged
   m_Icon: {fileID: 0}

@@ -4,6 +4,8 @@ using System.Collections;
 
 public class PlayerController : MonoBehaviour
 {
+    GameManager _gameManager;
+
     // =========================================================
     // 플레이어 이동 옵션
     // =========================================================
@@ -27,14 +29,18 @@ public class PlayerController : MonoBehaviour
     // =========================================================
     // 마우스 위치 체크
     // =========================================================
-    Vector3 _startMpos;
-    Vector3 _nextMpos;
-    Vector3 _mDir;
+    Vector2 _startMpos;
+    Vector2 _nextMpos;
+    Vector2 _mDir;
 
     // =========================================================
     // Raycast 옵션
     // =========================================================
-    float _maxDistance = 3f;
+    Vector3 _origin;
+    RaycastHit _hit;
+
+    float _maxDistance = 2.1f;
+    float _maxHeight = 0.6f;
 
     // =========================================================
     // 상태 체크
@@ -44,12 +50,13 @@ public class PlayerController : MonoBehaviour
     // =========================================================
     // 레이어 확인
     // =========================================================
-    int _layerMask;
+    int _layerObstacle;
+    int _layerRiver;
 
     // =========================================================
     // 스와이프 체크
     // =========================================================
-    public Vector3 SwipeCheck()
+    public void SwipeInput()
     {
         if (Mouse.current.leftButton.wasPressedThisFrame)
         {
@@ -61,11 +68,7 @@ public class PlayerController : MonoBehaviour
         {
             Vector2 pos = Mouse.current.position.ReadValue();
             _nextMpos = new Vector3(pos.x, pos.y, 0f);
-
-            return (_nextMpos - _startMpos).normalized;
         }
-
-        return Vector3.zero;
     }
 
     // =========================================================
@@ -160,10 +163,9 @@ public class PlayerController : MonoBehaviour
     // ========================================================= 
     public bool IsObstacle(Vector3 dir)
     {
-        Vector3 origin = transform.position;
-        RaycastHit hit;
+        _origin = transform.position;
 
-        if (Physics.Raycast(origin, dir, out hit, _maxDistance, _layerMask)) 
+        if (Physics.Raycast(_origin, dir, out _hit, _maxDistance, _layerObstacle)) 
         { 
             return true;
         }
@@ -231,7 +233,10 @@ public class PlayerController : MonoBehaviour
     // =========================================================
     void Start()
     {
-        _layerMask = LayerMask.GetMask("Obstacle");
+        _gameManager = GameManager._GM;
+
+        _layerObstacle = LayerMask.GetMask("Obstacle");
+        _layerRiver = LayerMask.GetMask("River");
     }
 
     // =========================================================
@@ -239,7 +244,9 @@ public class PlayerController : MonoBehaviour
     // =========================================================
     void Update()
     {
-        SwipeCheck();
+        if (_gameManager.IsGameOver) return;
+
+        SwipeInput();
 
         // 플레이어 점프 준비 동작
         if (Mouse.current.leftButton.IsPressed())
