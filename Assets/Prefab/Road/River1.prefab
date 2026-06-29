@@ -4929,6 +4929,59 @@ Transform:
   m_Children: []
   m_Father: {fileID: 4116665429559449780}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &3834120075403607259
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 900685888856101986}
+  - component: {fileID: 6935579074555238385}
+  m_Layer: 10
+  m_Name: River_Surface
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &900685888856101986
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3834120075403607259}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 50, y: 0.1, z: 2}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 4116665429559449780}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!65 &6935579074555238385
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3834120075403607259}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1, y: 1, z: 1}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &3969358149219813902
 GameObject:
   m_ObjectHideFlags: 0
@@ -9842,7 +9895,7 @@ GameObject:
   - component: {fileID: 3668150664442137483}
   - component: {fileID: 7263890785669107641}
   m_Layer: 8
-  m_Name: River
+  m_Name: River_Trigger
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -9955,6 +10008,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a8b00b8da6704054f9075f56cf081525, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RiverController
+  _splashPrefab: {fileID: 3426444474379522449, guid: 15e2cf24b60a9c5499c28b26a8e421f7, type: 3}
 --- !u!1 &8555651437044102429
 GameObject:
   m_ObjectHideFlags: 0
@@ -9986,6 +10040,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 3077683866160875619}
+  - {fileID: 900685888856101986}
   - {fileID: 4652568189738215068}
   - {fileID: 4924502965011028790}
   - {fileID: 3084601777107292832}
