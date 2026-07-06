@@ -5,6 +5,8 @@ using System.Collections;
 public class PlayerController : MonoBehaviour
 {
     GameManager _gameManager;
+    LogMovement _logMovement;
+    Transform _defaultParent;
 
     // =========================================================
     // 플레이어 이동 옵션
@@ -12,6 +14,9 @@ public class PlayerController : MonoBehaviour
     [SerializeField] float _moveDistance = 1f;
     [SerializeField] float _speed = 1f;
     [SerializeField] float _jumpHeight = 1.2f;
+
+    // 통나무 탑승시 고정 높이
+    [SerializeField] float _rideY = 1f;
 
     // =========================================================
     // 최소 스와이프 거리
@@ -40,18 +45,20 @@ public class PlayerController : MonoBehaviour
     RaycastHit _hit;
 
     float _maxDistance = 2.1f;
-    float _maxHeight = 0.6f;
 
     // =========================================================
     // 상태 체크
     // =========================================================
     bool _isMoving = false;
 
+    public bool isLog => transform.parent != _defaultParent;
+
     // =========================================================
     // 레이어 확인
     // =========================================================
     int _layerObstacle;
-    int _layerRiver;
+    int _layerLog;
+    int _layerLotus;
 
     // =========================================================
     // 스와이프 체크
@@ -166,7 +173,7 @@ public class PlayerController : MonoBehaviour
         _origin = transform.position;
 
         if (Physics.Raycast(_origin, dir, out _hit, _maxDistance, _layerObstacle)) 
-        { 
+        {
             return true;
         }
         return false;
@@ -178,6 +185,7 @@ public class PlayerController : MonoBehaviour
     IEnumerator CoCharJump(Vector3 dir)
     {
         _isMoving = true;
+        transform.SetParent(_defaultParent);
 
         Vector3 startPos = transform.position;
         Vector3 endPos = startPos + dir * _moveDistance;
@@ -199,6 +207,12 @@ public class PlayerController : MonoBehaviour
         }
 
         transform.position = endPos;
+
+        // 착지 후 검사
+        CheckRiverUp();
+
+        _logMovement = null;
+
         _isMoving = false;
     }
 
@@ -224,8 +238,37 @@ public class PlayerController : MonoBehaviour
 
         // 캐릭터 Y축 높이 감소
         Vector3 pos = transform.position;
-        pos.y = _floorY + scale.y * 0.5f;
+        pos.y = _floorY + scale.y * 0.65f;
         transform.position = pos;
+    }
+
+    // =========================================================
+    // 통나무 확인
+    // =========================================================
+    public bool CheckRiverUp()
+    {
+        Vector3 origin = transform.position + Vector3.up * 0.5f;
+
+        if (Physics.Raycast(origin, Vector3.down, out _hit, 2f, _layerLog) || 
+            Physics.Raycast(origin, Vector3.down, out _hit, 2f, _layerLotus))
+        {
+            LogMovement log = _hit.collider.GetComponent<LogMovement>();
+
+            if (log != null)
+            {
+                // 부모 설정
+                transform.SetParent(log.transform);
+
+                Vector3 pos = transform.position;
+
+                pos.y = _hit.collider.bounds.max.y + GetComponent<Collider>().bounds.extents.y;
+
+                transform.position = pos;
+
+                return true;
+            }
+        }
+        return false;
     }
 
     // =========================================================
@@ -235,8 +278,11 @@ public class PlayerController : MonoBehaviour
     {
         _gameManager = GameManager._GM;
 
+        _defaultParent = transform.parent;
+
         _layerObstacle = LayerMask.GetMask("Obstacle");
-        _layerRiver = LayerMask.GetMask("River");
+        _layerLog = LayerMask.GetMask("Log");
+        _layerLotus = LayerMask.GetMask("Lotus");
     }
 
     // =========================================================

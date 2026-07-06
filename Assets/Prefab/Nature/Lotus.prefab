@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 1741803852682894684}
   - component: {fileID: 4186016724118278872}
   - component: {fileID: 4734430569998294547}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: Lotus3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -124,7 +124,7 @@ GameObject:
   - component: {fileID: 1659214572868471965}
   - component: {fileID: 5625499147128677159}
   - component: {fileID: 7947951975976909702}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: Lotus2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -234,7 +234,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7986399416980639768}
   - component: {fileID: 7673033240254947158}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: Lotus
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -280,7 +280,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6934679104778642856}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: Lotus
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -318,7 +318,7 @@ GameObject:
   - component: {fileID: 1335132642986602265}
   - component: {fileID: 3552286347052397368}
   - component: {fileID: 641966222819887235}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: Lotus1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -430,7 +430,7 @@ GameObject:
   - component: {fileID: 8802569924153133540}
   - component: {fileID: 6019495815697448741}
   - component: {fileID: 1087107529402726118}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: Lotus4
   m_TagString: Untagged
   m_Icon: {fileID: 0}

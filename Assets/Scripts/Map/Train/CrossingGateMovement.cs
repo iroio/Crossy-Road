@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -17,6 +18,8 @@ public class CrossingGateMovement : MonoBehaviour
     int _randomX;
 
     bool _isEnd;
+
+    List<int> _gatePos = new List<int>();
 
     // =========================================================
     // 애니메이션 종료
@@ -59,10 +62,18 @@ public class CrossingGateMovement : MonoBehaviour
     // =========================================================
     public void SetPosition()
     {
-        _randomX = Random.Range(-9, 6);
+        // spawn 가능한 위치 초기화
+        _gatePos.Clear();
+
+        // -8 부터 8 까지 2씩 증가하는 값을 리스트에 저장
+        for (int x = -8; x <= 8; x += 2) 
+        {
+            _gatePos.Add(x); 
+        }
+
+        _randomX = _gatePos[Random.Range(0, _gatePos.Count)];
 
         _newPos = new Vector3(_randomX, 0f, transform.position.z);
-
         transform.position = _newPos;
     }
 

@@ -26,20 +26,23 @@ public class RiverController : MonoBehaviour
     // ========================================================= 
     void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("Player"))
-        {
-            _gameManager.GameOver();
+        PlayerController player = other.GetComponentInParent<PlayerController>();
 
-            // 게임오버 판정 이후 진행할 로직
+        // 중복 실행 방지
+        if (player == null) return;
 
-            // 이펙트 생성
-            Instantiate(_splashPrefab, other.transform.position, _splashPrefab.transform.rotation);
+        // 통나무?
+        if (player.CheckRiverUp()) return;
 
-            // 위치 내리기
-            StartCoroutine(Sink(other.transform));
+        _gameManager.GameOver();
 
+        // 게임오버 판정 이후 진행할 로직
 
-        }
+        // 이펙트 생성
+        Instantiate(_splashPrefab, player.transform.position, _splashPrefab.transform.rotation);
+
+        // 위치 내리기
+        StartCoroutine(Sink(player.transform));
     }
 
     void Start()

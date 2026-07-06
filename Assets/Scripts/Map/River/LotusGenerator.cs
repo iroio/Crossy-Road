@@ -26,7 +26,7 @@ public class LotusGenerator : MonoBehaviour
 
         if (lotus == null) return;
 
-        lotus.transform.position = new Vector3(x, 0f, transform.position.z);
+        lotus.transform.position = new Vector3(x, 0.15f, transform.position.z);
         lotus.transform.rotation = Quaternion.Euler(0f, angle, 0f);
 
         lotus.gameObject.SetActive(true);
@@ -53,7 +53,7 @@ public class LotusGenerator : MonoBehaviour
         // spawn 가능한 위치 초기화
         _lotusPos.Clear();
 
-        for (int x = -8; x <= 8; x += 2) 
+        for (int x = -8; x <= 8; x ++) 
         {
             _lotusPos.Add(x);
         }

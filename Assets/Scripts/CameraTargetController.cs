@@ -2,6 +2,8 @@
 
 public class CameraTargetController : MonoBehaviour
 {
+    GameManager _gameManager;
+
     // =========================================================
     // 타겟 옵션 설정
     // =========================================================
@@ -16,8 +18,16 @@ public class CameraTargetController : MonoBehaviour
     // =========================================================
     // Update
     // =========================================================
+
+    void Start()
+    {
+        _gameManager = GameManager._GM;
+    }
+
     void Update()
     {
+        if (_gameManager.IsGameOver) return;
+
         transform.position += Vector3.forward * _speed * Time.deltaTime;
 
         _targetPos = _player.position;

@@ -81,7 +81,7 @@ public class CarGenerator : MonoBehaviour
             return car;
         });
 
-        _isLeft = Random.value > 0.5f;
+        _isLeft = Random.Range(0, 2) == 0;
 
         _randomPoint = _isLeft ? _spawnPoints[0] : _spawnPoints[1];
 

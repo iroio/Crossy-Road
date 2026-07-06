@@ -28,8 +28,13 @@ public class LogGenerator : MonoBehaviour
 
         if (log == null) return;
 
+        bool moveRight = _randomPoint == _spawnPoints[0];
+
         log.transform.position = _randomPoint.position;
-        log.transform.rotation = Quaternion.Euler(0f, angle, 0f);
+        log.transform.rotation = Quaternion.Euler(45f, 0f, moveRight ? 90f : -90f);
+
+        // 이동 방향 전달
+        log.SetDirection(moveRight);
 
         log.gameObject.SetActive(true);
     }
@@ -70,7 +75,7 @@ public class LogGenerator : MonoBehaviour
             var obj = Instantiate(_log, _root);
             obj.SetActive(false);
 
-            var log = obj.GetComponent<LogMovement>();
+            var log = obj.GetComponentInChildren<LogMovement>();
             log.InitLog(this);
 
             return log;

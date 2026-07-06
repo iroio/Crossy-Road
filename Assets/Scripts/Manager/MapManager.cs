@@ -13,6 +13,9 @@ public class MapManager : MonoBehaviour
 
     Queue<GameObject> _rows = new Queue<GameObject> ();
 
+    // =========================================================
+    // 행 생성
+    // =========================================================
     void AddRows()
     {
         List<GameObject> newRows = _generator.SpawnRow();
@@ -23,6 +26,9 @@ public class MapManager : MonoBehaviour
         }
     }
 
+    // =========================================================
+    // 행 제거
+    // =========================================================
     void RemoveOldRows()
     {
         while (_rows.Count > 0)
@@ -37,6 +43,9 @@ public class MapManager : MonoBehaviour
         }
     }
 
+    // =========================================================
+    // 위치 확인
+    // =========================================================
     public void CheckPos()
     {
         // 플레이어 앞에 충분한 맵이 없으면 생성
@@ -48,13 +57,17 @@ public class MapManager : MonoBehaviour
         RemoveOldRows();
     }
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
+    // =========================================================
+    // Start
+    // =========================================================
     void Start()
     {
         AddRows();
     }
 
-    // Update is called once per frame
+    // =========================================================
+    // Update
+    // =========================================================
     void Update()
     {
         CheckPos();
