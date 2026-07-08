@@ -209,7 +209,7 @@ public class PlayerController : MonoBehaviour
         transform.position = endPos;
 
         // 착지 후 검사
-        CheckRiverUp();
+        CheckLogRide();
 
         _logMovement = null;
 
@@ -245,7 +245,7 @@ public class PlayerController : MonoBehaviour
     // =========================================================
     // 통나무 확인
     // =========================================================
-    public bool CheckRiverUp()
+    public bool CheckLogRide()
     {
         Vector3 origin = transform.position + Vector3.up * 0.5f;
 
@@ -307,6 +307,11 @@ public class PlayerController : MonoBehaviour
         if (Mouse.current.leftButton.wasReleasedThisFrame)
         {
             SwipeDir();
+        }
+
+        if(_gameManager.IsGameOver && Mouse.current.leftButton.wasReleasedThisFrame)
+        {
+            GameManager._GM.BackToMain();
         }
     }
 }

@@ -1,25 +1,33 @@
 using UnityEngine;
 
+public enum GameState
+{
+    Main,
+    Playing,
+    GameOver
+}
+
 public class GameManager : MonoBehaviour
 {
     public static GameManager _GM;
 
     int _score = 0;
+    int _highScore;
 
-    bool _isGameOver;
-    bool _isPlaying;
+    public bool IsPlaying => CurrentState == GameState.Playing;
+    public bool IsGameOver => CurrentState == GameState.GameOver;
+    public bool IsMain => CurrentState == GameState.Main;
 
-    public bool IsGameOver => _isGameOver;
+    public GameState CurrentState { get; private set; }
 
     public void AddScore(int score)
     {
         _score += score;
     }
 
-    public void StartGame()
+    public void ReStartGame()
     {
-        _isPlaying = true;
-        _isGameOver = false;
+        ChangeState(GameState.Playing);
         _score = 0;
     }
 
@@ -27,14 +35,35 @@ public class GameManager : MonoBehaviour
     {
         Debug.Log("Game Over");
 
-        _isGameOver = true;
+        ChangeState(GameState.GameOver);
+        // 최고 기록
+
     }
 
-    public void ResetGame()
+    public void BackToMain()
     {
-        _isGameOver = false;
-        _isPlaying = false;
+        ChangeState(GameState.Main);
         _score = 0;
+    }
+
+    public void ChangeState(GameState state)
+    {
+        CurrentState = state;
+
+        switch (state)
+        {
+            case GameState.Main:
+
+                break;
+
+            case GameState.Playing:
+
+                break;
+
+            case GameState.GameOver:
+
+                break;
+        }
     }
 
     private void Awake()
@@ -49,6 +78,6 @@ public class GameManager : MonoBehaviour
             Destroy(gameObject);
         }
 
-        _score = PlayerPrefs.GetInt("HighScore", 0);
+        //_score = PlayerPrefs.GetInt("HighScore", 0);
     }
 }
