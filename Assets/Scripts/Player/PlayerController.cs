@@ -308,10 +308,5 @@ public class PlayerController : MonoBehaviour
         {
             SwipeDir();
         }
-
-        if(_gameManager.IsGameOver && Mouse.current.leftButton.wasReleasedThisFrame)
-        {
-            GameManager._GM.BackToMain();
-        }
     }
 }

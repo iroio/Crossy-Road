@@ -1,12 +1,5 @@
 using UnityEngine;
 
-public enum GameState
-{
-    Main,
-    Playing,
-    GameOver
-}
-
 public class GameManager : MonoBehaviour
 {
     public static GameManager _GM;
@@ -14,20 +7,24 @@ public class GameManager : MonoBehaviour
     int _score = 0;
     int _highScore;
 
-    public bool IsPlaying => CurrentState == GameState.Playing;
-    public bool IsGameOver => CurrentState == GameState.GameOver;
-    public bool IsMain => CurrentState == GameState.Main;
+    bool _isGameOver;
+    bool _isPlaying;
 
-    public GameState CurrentState { get; private set; }
+    public bool IsPlaying => _isPlaying;
+    public bool IsGameOver => _isGameOver;
 
     public void AddScore(int score)
     {
         _score += score;
+
+        if(UIManager._UM != null)
+            UIManager._UM.ChangeScore(_score);
     }
 
-    public void ReStartGame()
+    public void StartGame()
     {
-        ChangeState(GameState.Playing);
+        _isPlaying = true;
+        _isGameOver = false;
         _score = 0;
     }
 
@@ -35,35 +32,26 @@ public class GameManager : MonoBehaviour
     {
         Debug.Log("Game Over");
 
-        ChangeState(GameState.GameOver);
-        // 최고 기록
+        _isGameOver = true;
 
-    }
-
-    public void BackToMain()
-    {
-        ChangeState(GameState.Main);
-        _score = 0;
-    }
-
-    public void ChangeState(GameState state)
-    {
-        CurrentState = state;
-
-        switch (state)
+        //최고기록
+        if (_score > _highScore)
         {
-            case GameState.Main:
-
-                break;
-
-            case GameState.Playing:
-
-                break;
-
-            case GameState.GameOver:
-
-                break;
+            _highScore = _score;
+            PlayerPrefs.SetInt("HighScore", _highScore);
+            PlayerPrefs.Save();
         }
+
+        //Result 텍스트 출력
+        if (UIManager._UM != null)
+            UIManager._UM.GameOverResult(_highScore);
+    }
+
+    public void ResetGame()
+    {
+        _isGameOver = false;
+        _isPlaying = false;
+        _score = 0;
     }
 
     private void Awake()
@@ -78,6 +66,6 @@ public class GameManager : MonoBehaviour
             Destroy(gameObject);
         }
 
-        //_score = PlayerPrefs.GetInt("HighScore", 0);
+        _highScore = PlayerPrefs.GetInt("HighScore", 0);
     }
 }

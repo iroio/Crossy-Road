@@ -1,6 +1,7 @@
 using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.SceneManagement;
 
 public class UIManager : MonoBehaviour
 {
@@ -10,52 +11,78 @@ public class UIManager : MonoBehaviour
 
     public static UIManager _UM;
 
-    public void ShowMain()
+    bool _isLoading = false;
+    bool _isGameOver = false;
+
+    public void OnClickPlay()
     {
-        Debug.Log("Main");
+        if (_isLoading) return;
+
+        _isLoading = true;
+
+        GameManager._GM.ResetGame();
+
+        ScenesManager.Instance.LoadScene("Game");
     }
 
-    public void ShowGame()
+    public void onClickRetry()
     {
-        Debug.Log("Playing");
+        Debug.Log("Retry Click");
+
+        if (_isLoading) return;
+
+        _isLoading = true;
+
+        ScenesManager.Instance.LoadScene("Load");
     }
 
-    public void ShowGameOver()
+    public void ChangeScore(int score)
     {
-        Debug.Log("GameOver");
+        _scoreTmp.text = score.ToString();
+    }
+
+    public void GameOverResult(int highScore)
+    {
+        _canvas.gameObject.SetActive(true);
+        _resultTmp.text = highScore.ToString();
+        _isGameOver = true;
+    }
+
+    public void LoadTitle()
+    {
+        GameManager._GM.ResetGame();
+        ScenesManager.Instance.LoadScene("Title");
     }
 
     public void Awake()
     {
-        if(_UM==null)
-        {
-            _UM = this;
+        _UM = this;
 
-            DontDestroyOnLoad(gameObject);
+        _isLoading = false;
+        _isGameOver = false;
 
-            if (_canvas != null)
-                _canvas.gameObject.SetActive(false);
-        }
-        else
-        {
-            Destroy(gameObject);
-        }
+        if (_canvas != null)
+            _canvas.gameObject.SetActive(false);
     }
 
     void Update()
     {
-        if (Mouse.current.leftButton.wasPressedThisFrame)
+        if (_isGameOver)
         {
-            switch (GameManager._GM.CurrentState)
-            {
-                case GameState.Main:
-                    GameManager._GM.ReStartGame();
-                    break;
+            return;
+        }
 
-                case GameState.GameOver:
-                    GameManager._GM.BackToMain();
-                    break;
+        if (SceneManager.GetActiveScene().name == "Title")
+        {
+            if (Mouse.current.leftButton.wasPressedThisFrame)
+            {
+                OnClickPlay();
             }
+        }
+
+        if (Keyboard.current.fKey.wasPressedThisFrame)
+        {
+            FadeManager.Instance.TestFade();
         }
     }
 }
