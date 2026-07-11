@@ -1,88 +1,132 @@
 using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.SceneManagement;
 
 public class UIManager : MonoBehaviour
 {
+    // =========================================================
+    // UI 패널 연결
+    // =========================================================
+    [SerializeField] GameObject _mainPanel;
+    [SerializeField] GameObject _gamePanel;
+    [SerializeField] GameObject _resultPanel;
+    [SerializeField] GameObject _ButtonPanel;
+
+    // =========================================================
+    // 움직일 대상
+    // =========================================================
+    [SerializeField] TitleMovement _titleMovement;
+
+    // =========================================================
+    // 점수
+    // =========================================================
     [SerializeField] TextMeshProUGUI _scoreTmp;
     [SerializeField] TextMeshProUGUI _resultTmp;
-    [SerializeField] Canvas _canvas;
 
     public static UIManager _UM;
 
     bool _isLoading = false;
-    bool _isGameOver = false;
 
-    public void OnClickPlay()
+    // =========================================================
+    // 버튼 함수
+    // =========================================================
+    public void OnClickRetry()
     {
         if (_isLoading) return;
 
         _isLoading = true;
-
-        GameManager._GM.ResetGame();
 
         ScenesManager.Instance.LoadScene("Game");
     }
 
-    public void onClickRetry()
-    {
-        Debug.Log("Retry Click");
-
-        if (_isLoading) return;
-
-        _isLoading = true;
-
-        ScenesManager.Instance.LoadScene("Load");
-    }
-
+    // =========================================================
+    // 점수 변경
+    // =========================================================
     public void ChangeScore(int score)
     {
         _scoreTmp.text = score.ToString();
     }
 
+    // =========================================================
+    // 게임 오버 결과 출력
+    // =========================================================
     public void GameOverResult(int highScore)
     {
-        _canvas.gameObject.SetActive(true);
         _resultTmp.text = highScore.ToString();
-        _isGameOver = true;
+
+        ShowGameOver();
     }
 
+    // =========================================================
+    // Title 블러오기
+    // =========================================================
     public void LoadTitle()
     {
         GameManager._GM.ResetGame();
         ScenesManager.Instance.LoadScene("Title");
     }
 
+    // =========================================================
+    // Main 일때 UI 상태
+    // =========================================================
+    public void ShowMain()
+    {
+        _mainPanel.SetActive(true);
+        _gamePanel.SetActive(false);
+        _resultPanel.SetActive(false);
+        _ButtonPanel.SetActive(false);
+    }
+
+    // =========================================================
+    // 게임 중 UI 상태
+    // =========================================================
+    public void ShowPlaying()
+    {
+        _mainPanel.SetActive(true);
+        _gamePanel.SetActive(true);
+        _resultPanel.SetActive(false);
+        _ButtonPanel.SetActive(false);
+    }
+
+    // =========================================================
+    // 게임오버일 때 UI 상태
+    // =========================================================
+    public void ShowGameOver()
+    {
+        _mainPanel.SetActive(false);
+        _gamePanel.SetActive(true);
+        _resultPanel.SetActive(true);
+        _ButtonPanel.SetActive(true);
+    }
+
+    // =========================================================
+    // Awake
+    // =========================================================
     public void Awake()
     {
         _UM = this;
-
-        _isLoading = false;
-        _isGameOver = false;
-
-        if (_canvas != null)
-            _canvas.gameObject.SetActive(false);
     }
 
+    // =========================================================
+    // Start
+    // =========================================================
+    void Start()
+    {
+        GameManager._GM.ChangeState(GameState.Main);
+    }
+
+    // =========================================================
+    // Update
+    // =========================================================
     void Update()
     {
-        if (_isGameOver)
-        {
-            return;
-        }
+        if (!GameManager._GM.IsMain) return;
 
-        if (SceneManager.GetActiveScene().name == "Title")
+        if (Mouse.current.leftButton.wasPressedThisFrame)
         {
-            if (Mouse.current.leftButton.wasPressedThisFrame)
-            {
-                OnClickPlay();
-            }
-        }
+            GameManager._GM.StartGame();
 
-        if (Keyboard.current.fKey.wasPressedThisFrame)
-        {
-            FadeManager.Instance.TestFade();
+            StartCoroutine(_titleMovement.CoMoveOut());
         }
     }
 }

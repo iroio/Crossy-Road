@@ -10,20 +10,6 @@ public class FadeManager : MonoBehaviour
 
     [SerializeField] float _fadeTime = 0.5f;
 
-    public void TestFade()
-    {
-        StartCoroutine(CoTestFade());
-    }
-
-    IEnumerator CoTestFade()
-    {
-        yield return CoFadeOut();
-
-        yield return new WaitForSeconds(1f);
-
-        yield return CoFadeIn();
-    }
-
     // =========================================================
     // Fade Out
     // =========================================================
@@ -48,6 +34,8 @@ public class FadeManager : MonoBehaviour
     // =========================================================
     public IEnumerator CoFadeIn()
     {
+        Debug.Log(_canvasGroup);
+
         float time = 0f;
 
         while (time < _fadeTime)
@@ -62,6 +50,9 @@ public class FadeManager : MonoBehaviour
         _canvasGroup.alpha = 0f;
     }
 
+    // =========================================================
+    // Awake ¹× ½Ì±ÛÅæ
+    // =========================================================
     void Awake()
     {
         if(Instance == null)

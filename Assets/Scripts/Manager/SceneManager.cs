@@ -4,8 +4,21 @@ using UnityEngine.SceneManagement;
 
 public class ScenesManager : MonoBehaviour
 {
+    LoadingTitleMovement _loadingTitle;
+
     public static ScenesManager Instance;
 
+    // =========================================================
+    // 씬 로드
+    // =========================================================
+    public void LoadScene(string sceneName)
+    {
+        StartCoroutine(CoLoadScene(sceneName));
+    }
+
+    // =========================================================
+    // 비동기 씬 로드
+    // =========================================================
     IEnumerator Load(string sceneName)
     {
         AsyncOperation op = SceneManager.LoadSceneAsync(sceneName);
@@ -30,27 +43,43 @@ public class ScenesManager : MonoBehaviour
         Debug.Log("Done");
 
         yield return null;
-
-        if (sceneName == "Game")
-        {
-            GameManager._GM.StartGame();
-        }
     }
 
+    // =========================================================
+    // 페이드 인 아웃 흐름
+    // =========================================================
     IEnumerator CoLoadScene(string sceneName)
     {
-        // 화면 Fade out
-        yield return FadeManager.Instance.CoFadeOut();
+        // 페이드 아웃
+        Debug.Log("FadeOut Start");
+        yield return StartCoroutine(FadeManager.Instance.CoFadeOut());
+
+        // Load 씬 이동
+        yield return StartCoroutine(Load("Load"));
+
+        // 타이틀 IN
+        _loadingTitle = FindFirstObjectByType<LoadingTitleMovement>();
+        yield return _loadingTitle.CoMoveIn();
+
+        // 0.5초 대기
+        yield return new WaitForSeconds(0.5f);
 
         // 씬 로드
         yield return StartCoroutine(Load(sceneName));
+
+        // 초기화
+        if (sceneName == "Game")
+        {
+            GameManager._GM.ResetGame();
+        }
+
+        // 페이드 인
+        yield return StartCoroutine(FadeManager.Instance.CoFadeIn());
     }
 
-    public void LoadScene(string sceneName)
-    {
-        StartCoroutine(CoLoadScene(sceneName));
-    }
-
+    // =========================================================
+    // Awake 및 싱글톤 적용
+    // =========================================================
     void Awake()
     {
         if (Instance == null)
