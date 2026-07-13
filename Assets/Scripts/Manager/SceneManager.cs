@@ -4,7 +4,7 @@ using UnityEngine.SceneManagement;
 
 public class ScenesManager : MonoBehaviour
 {
-    LoadingTitleMovement _loadingTitle;
+    TitleMovement _loadingTitle;
 
     public static ScenesManager Instance;
 
@@ -58,8 +58,8 @@ public class ScenesManager : MonoBehaviour
         yield return StartCoroutine(Load("Load"));
 
         // 타이틀 IN
-        _loadingTitle = FindFirstObjectByType<LoadingTitleMovement>();
-        yield return _loadingTitle.CoMoveIn();
+        TitleMovement loadingTitle = FindFirstObjectByType<TitleMovement>();
+        yield return loadingTitle.CoMoveIn();
 
         // 0.5초 대기
         yield return new WaitForSeconds(0.5f);

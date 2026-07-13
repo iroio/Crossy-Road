@@ -16,14 +16,16 @@ public class CameraTargetController : MonoBehaviour
     Vector3 _targetPos;
 
     // =========================================================
-    // Update
+    // Start
     // =========================================================
-
     void Start()
     {
         _gameManager = GameManager._GM;
     }
 
+    // =========================================================
+    // Update
+    // =========================================================
     void Update()
     {
         if (_gameManager.CurrentState == GameState.GameOver) return;

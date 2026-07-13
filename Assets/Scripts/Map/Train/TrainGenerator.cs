@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.InputSystem;
 
 public class TrainGenerator : MonoBehaviour
 {
@@ -51,6 +50,9 @@ public class TrainGenerator : MonoBehaviour
         _randomPoint = _isLeft ? _spawnPoints[0] : _spawnPoints[1];
     }
 
+    // =========================================================
+    // 이 오브젝트가 삭제되면
+    // =========================================================
     void OnDestroy()
     {
         RemoveTrain();

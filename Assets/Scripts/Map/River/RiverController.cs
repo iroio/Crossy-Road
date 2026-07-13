@@ -7,6 +7,9 @@ public class RiverController : MonoBehaviour
 
     GameManager _gameManager;
 
+    // =========================================================
+    // 캐릭터 내리기
+    // =========================================================
     IEnumerator Sink(Transform target)
     {
         Vector3 start = target.position;
@@ -37,7 +40,6 @@ public class RiverController : MonoBehaviour
         _gameManager.GameOver();
 
         // 게임오버 판정 이후 진행할 로직
-
         // 이펙트 생성
         Instantiate(_splashPrefab, player.transform.position, _splashPrefab.transform.rotation);
 
@@ -45,6 +47,9 @@ public class RiverController : MonoBehaviour
         StartCoroutine(Sink(player.transform));
     }
 
+    // =========================================================
+    // Start
+    // =========================================================
     void Start()
     {
         _gameManager = GameManager._GM;
