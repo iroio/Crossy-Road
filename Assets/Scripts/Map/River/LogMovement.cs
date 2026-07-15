@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class LogMovement : MonoBehaviour
+public class LogMovement : RidePlatform
 {
     LogGenerator _logGenerator;
     

@@ -47,6 +47,11 @@ public class PlayerController : MonoBehaviour
     float _maxDistance = 2.1f;
 
     // =========================================================
+    // 탑승 감지용
+    // =========================================================
+    Collider _collider;
+
+    // =========================================================
     // 상태 체크
     // =========================================================
     bool _isMoving = false;
@@ -56,9 +61,9 @@ public class PlayerController : MonoBehaviour
     // =========================================================
     // 레이어 확인
     // =========================================================
-    int _layerObstacle;
-    int _layerLog;
-    int _layerLotus;
+    int _Obstacle;
+    int _layerRide;
+    int _layerRiver;
 
     // =========================================================
     // 스와이프 체크
@@ -172,11 +177,21 @@ public class PlayerController : MonoBehaviour
     {
         _origin = transform.position;
 
-        if (Physics.Raycast(_origin, dir, out _hit, _maxDistance, _layerObstacle)) 
+        if (Physics.Raycast(_origin, dir, out _hit, _maxDistance, _Obstacle)) 
         {
             return true;
         }
         return false;
+    }
+
+    // =========================================================
+    // 강 여부 확인
+    // =========================================================
+    public bool IsRiver()
+    {
+        Vector3 origin = transform.position + Vector3.up * 0.5f;
+
+        return Physics.Raycast(origin, Vector3.down, 2f, _layerRiver);
     }
 
     // =========================================================
@@ -208,11 +223,16 @@ public class PlayerController : MonoBehaviour
 
         transform.position = endPos;
 
-        // 착지 후 검사
-        CheckLogRide();
+        // 앞으로 이동했을 때만
+        if(dir == Vector3.forward)
+        {
+            _gameManager.AddScore(1);
+        }
+
+        // 착지 후 탑승 검사
+        CheckRide();
 
         _logMovement = null;
-
         _isMoving = false;
     }
 
@@ -243,32 +263,37 @@ public class PlayerController : MonoBehaviour
     }
 
     // =========================================================
-    // 통나무 확인
+    // 플렛폼 탑승 확인
     // =========================================================
-    public bool CheckLogRide()
+    public bool CheckRide()
     {
         Vector3 origin = transform.position + Vector3.up * 0.5f;
 
-        if (Physics.Raycast(origin, Vector3.down, out _hit, 2f, _layerLog) || 
-            Physics.Raycast(origin, Vector3.down, out _hit, 2f, _layerLotus))
+        if (!Physics.Raycast(origin, Vector3.down, out _hit, 2f, _layerRide | _layerRiver))
+            return true;
+
+        // 강이 먼저 맞았다면 탈 것이 없음
+        if (_hit.collider.gameObject.layer == LayerMask.NameToLayer("River"))
         {
-            LogMovement log = _hit.collider.GetComponent<LogMovement>();
-
-            if (log != null)
-            {
-                // 부모 설정
-                transform.SetParent(log.transform);
-
-                Vector3 pos = transform.position;
-
-                pos.y = _hit.collider.bounds.max.y + GetComponent<Collider>().bounds.extents.y;
-
-                transform.position = pos;
-
-                return true;
-            }
+            _gameManager.GameOver();
+            return false;
         }
-        return false;
+
+        if (_hit.collider.TryGetComponent(out RidePlatform platform))
+        {
+            transform.SetParent(platform.transform);
+
+            Vector3 pos = transform.position;
+            pos.y = _hit.collider.bounds.max.y + _collider.bounds.extents.y;
+            transform.position = pos;
+        }
+
+        return true;
+    }
+
+    void Awake()
+    {
+        _collider = GetComponent<Collider>();
     }
 
     // =========================================================
@@ -280,9 +305,9 @@ public class PlayerController : MonoBehaviour
 
         _defaultParent = transform.parent;
 
-        _layerObstacle = LayerMask.GetMask("Obstacle");
-        _layerLog = LayerMask.GetMask("Log");
-        _layerLotus = LayerMask.GetMask("Lotus");
+        _Obstacle = LayerMask.GetMask("Obstacle");
+        _layerRide = LayerMask.GetMask("LayerRide");
+        _layerRiver = LayerMask.GetMask("River");
     }
 
     // =========================================================

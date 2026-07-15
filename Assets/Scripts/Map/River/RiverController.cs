@@ -35,7 +35,7 @@ public class RiverController : MonoBehaviour
         if (player == null) return;
 
         // Ελ³ͺΉ«?
-        if (player.CheckLogRide()) return;
+        if (player.CheckRide()) return;
 
         _gameManager.GameOver();
 

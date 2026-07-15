@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class LotusMovement : MonoBehaviour
+public class LotusMovement : RidePlatform
 {
     LotusGenerator _lotusGenerator;
 

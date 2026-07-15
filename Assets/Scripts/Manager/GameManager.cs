@@ -52,6 +52,8 @@ public class GameManager : MonoBehaviour
     // =========================================================
     public void GameOver()
     {
+        if (IsGameOver) return;
+
         Debug.Log("Game Over");
 
         ChangeState(GameState.GameOver);

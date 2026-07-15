@@ -9,8 +9,8 @@ public class CarGenerator : MonoBehaviour
     [SerializeField] List<GameObject> _cars = new List<GameObject>();
 
     [Header("Spawn Delay min-max")]
-    [SerializeField] float _min = 2f;
-    [SerializeField] float _max = 5f;
+    [SerializeField] float _min = 0.1f;
+    [SerializeField] float _max = 2f;
 
     Transform _randomPoint;
 
@@ -50,14 +50,23 @@ public class CarGenerator : MonoBehaviour
     // =========================================================
     IEnumerator CoSpawnCars()
     {
-        while (true)
-        {
-            float angle =  _randomPoint == _spawnPoints[0] ? 90f : -90f;
+        float angle = _randomPoint == _spawnPoints[0] ? 90f : -90f;
 
+        int startCount = Random.Range(0, 3);
+
+        for (int i = 0; i < startCount; i++)
+        {
             SpawnCar(angle);
 
+            yield return new WaitForSeconds(Random.Range(0.3f, 1f));
+        }
+
+        while (true)
+        {
             _spawnDelay = Random.Range(_min, _max);
             yield return new WaitForSeconds(_spawnDelay);
+
+            SpawnCar(angle);
         }
     }
 

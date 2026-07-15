@@ -43,7 +43,7 @@ public class LotusGenerator : MonoBehaviour
     // =========================================================
     // 연꽃잎 생성
     // =========================================================
-    void SpawnLotusGropu()
+    void SpawnLotusGroup()
     {
         float angle = Random.Range(0, 360f);
         _randomCount = Random.Range(_lotusMin, _lotusMax + 1);
@@ -51,7 +51,7 @@ public class LotusGenerator : MonoBehaviour
         // spawn 가능한 위치 초기화
         _lotusPos.Clear();
 
-        for (int x = -8; x <= 8; x ++) 
+        for (int x = -8; x <= 8; x += 2) 
         {
             _lotusPos.Add(x);
         }
@@ -84,6 +84,6 @@ public class LotusGenerator : MonoBehaviour
             return lotus;
         });
 
-        SpawnLotusGropu();
+        SpawnLotusGroup();
     }
 }
