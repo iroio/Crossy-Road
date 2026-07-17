@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 5284529959604866562}
   - component: {fileID: 7629923124210087200}
   - component: {fileID: 8135521890960291406}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: Wheel_RL
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -101,7 +101,7 @@ GameObject:
   - component: {fileID: 7905072019264096679}
   - component: {fileID: 7066367345758482977}
   - component: {fileID: 2740482917738644262}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: Car Body
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -191,7 +191,7 @@ GameObject:
   - component: {fileID: 5602427138957588083}
   - component: {fileID: 8862150546779343008}
   - component: {fileID: 4995501368847569008}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: Wheel_RR
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -281,7 +281,7 @@ GameObject:
   - component: {fileID: 1635863501742325619}
   - component: {fileID: 4569576651596802034}
   - component: {fileID: 894628667630481873}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: Wheel_FL
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -370,9 +370,10 @@ GameObject:
   m_Component:
   - component: {fileID: 8203697665478284682}
   - component: {fileID: -8795690239537518081}
-  m_Layer: 0
+  - component: {fileID: 5199697795761931580}
+  m_Layer: 12
   m_Name: PIckup3
-  m_TagString: Untagged
+  m_TagString: Car
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -413,6 +414,27 @@ MonoBehaviour:
   _speed: 8
   _min: 5
   _max: 6
+--- !u!65 &5199697795761931580
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7477768706304919281}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 2.6, y: 2.2, z: 5.8}
+  m_Center: {x: 0, y: 1.15, z: 0}
 --- !u!1 &8058848494920697149
 GameObject:
   m_ObjectHideFlags: 0
@@ -424,7 +446,7 @@ GameObject:
   - component: {fileID: 8080608815019458891}
   - component: {fileID: 6768733310758449400}
   - component: {fileID: 2837201597580289067}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: Wheel_FR
   m_TagString: Untagged
   m_Icon: {fileID: 0}

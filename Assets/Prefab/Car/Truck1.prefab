@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 5506809433345138248}
   - component: {fileID: 8015777520416704503}
   - component: {fileID: 6507502686007403241}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: Wheel_RR2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -101,7 +101,7 @@ GameObject:
   - component: {fileID: 680060734585159454}
   - component: {fileID: 1741944057373994934}
   - component: {fileID: 2262284514114742394}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: Wheel_FL
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -191,7 +191,7 @@ GameObject:
   - component: {fileID: 7529949345486714940}
   - component: {fileID: 317837983873452998}
   - component: {fileID: 5370180626760289767}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: Body
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -280,9 +280,10 @@ GameObject:
   m_Component:
   - component: {fileID: 1599351460781693545}
   - component: {fileID: 5432187788224652488}
-  m_Layer: 0
+  - component: {fileID: 2262818468194694768}
+  m_Layer: 12
   m_Name: Truck1
-  m_TagString: Untagged
+  m_TagString: Car
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -325,6 +326,27 @@ MonoBehaviour:
   _speed: 8
   _min: 5
   _max: 6
+--- !u!65 &2262818468194694768
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3307702513037894837}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 3.5, y: 4.3, z: 9.2}
+  m_Center: {x: 0, y: 2.15, z: 0.2}
 --- !u!1 &4221418325757194785
 GameObject:
   m_ObjectHideFlags: 0
@@ -336,7 +358,7 @@ GameObject:
   - component: {fileID: 5257337860114878359}
   - component: {fileID: 8157390775269572173}
   - component: {fileID: 6622934299623157754}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: Wheel_RR1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -426,7 +448,7 @@ GameObject:
   - component: {fileID: 2053919431691084865}
   - component: {fileID: 2408927137677793442}
   - component: {fileID: 6982942633328402211}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: Wheel_RL2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -516,7 +538,7 @@ GameObject:
   - component: {fileID: 6365150338384560906}
   - component: {fileID: 1160840050963267737}
   - component: {fileID: 5396429816090879190}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: Wheel_FR
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -606,7 +628,7 @@ GameObject:
   - component: {fileID: 3153694976621062053}
   - component: {fileID: 5463857163511205830}
   - component: {fileID: 4370601723816490146}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: Wheel_RL1
   m_TagString: Untagged
   m_Icon: {fileID: 0}

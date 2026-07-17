@@ -33,8 +33,6 @@ public class FadeManager : MonoBehaviour
     // =========================================================
     public IEnumerator CoFadeIn()
     {
-        Debug.Log(_canvasGroup);
-
         float time = 0f;
 
         while (time < _fadeTime)

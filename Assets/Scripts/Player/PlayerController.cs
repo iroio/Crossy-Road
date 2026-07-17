@@ -195,6 +195,17 @@ public class PlayerController : MonoBehaviour
     }
 
     // =========================================================
+    // 자동차 충돌 여부 확인
+    // ========================================================= 
+    public void OnTriggerEnter(Collider other)
+    {
+        if(other.CompareTag("Car"))
+        {
+            _gameManager.GameOver();
+        }
+    }
+
+    // =========================================================
     // 점프 처리
     // ========================================================= 
     IEnumerator CoCharJump(Vector3 dir)
@@ -272,13 +283,14 @@ public class PlayerController : MonoBehaviour
         if (!Physics.Raycast(origin, Vector3.down, out _hit, 2f, _layerRide | _layerRiver))
             return true;
 
-        // 강이 먼저 맞았다면 탈 것이 없음
+        // 레이가 강에 먼저 맞으면 플렛폼이 없음
         if (_hit.collider.gameObject.layer == LayerMask.NameToLayer("River"))
         {
             _gameManager.GameOver();
             return false;
         }
 
+        // 레이가 맞을 플렛폼 식별
         if (_hit.collider.TryGetComponent(out RidePlatform platform))
         {
             transform.SetParent(platform.transform);
@@ -291,6 +303,9 @@ public class PlayerController : MonoBehaviour
         return true;
     }
 
+    // =========================================================
+    // Awake
+    // =========================================================
     void Awake()
     {
         _collider = GetComponent<Collider>();

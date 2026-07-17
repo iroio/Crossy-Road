@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 3820017507726508641}
   - component: {fileID: 9007337900837895212}
   - component: {fileID: 2385366825294599413}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: Wheel_FL
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -100,9 +100,10 @@ GameObject:
   m_Component:
   - component: {fileID: 5716687881888396284}
   - component: {fileID: 3279462057076089788}
-  m_Layer: 0
+  - component: {fileID: 3664040018238925136}
+  m_Layer: 12
   m_Name: Car1
-  m_TagString: Untagged
+  m_TagString: Car
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -143,6 +144,27 @@ MonoBehaviour:
   _speed: 8
   _min: 5
   _max: 6
+--- !u!65 &3664040018238925136
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2432322878901096503}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 2.6, y: 2.2, z: 6.2}
+  m_Center: {x: 0, y: 1.1, z: 0}
 --- !u!1 &2770255106682579951
 GameObject:
   m_ObjectHideFlags: 0
@@ -154,7 +176,7 @@ GameObject:
   - component: {fileID: 8462692252580083692}
   - component: {fileID: 2253548177762025396}
   - component: {fileID: 4763984470355987994}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: Wheel_RL
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -244,7 +266,7 @@ GameObject:
   - component: {fileID: 146620405972977365}
   - component: {fileID: 5389145496189705576}
   - component: {fileID: 6536565585698295593}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: Body
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -334,7 +356,7 @@ GameObject:
   - component: {fileID: 1954176175196768074}
   - component: {fileID: 1720738181806778663}
   - component: {fileID: 35146605298389556}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: Wheel_FR
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -424,7 +446,7 @@ GameObject:
   - component: {fileID: 8634106521357183452}
   - component: {fileID: 1690176458795794089}
   - component: {fileID: 2981513046015825064}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: Wheel_RR
   m_TagString: Untagged
   m_Icon: {fileID: 0}
