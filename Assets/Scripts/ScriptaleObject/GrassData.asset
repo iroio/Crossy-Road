@@ -16,4 +16,4 @@ MonoBehaviour:
   prefab: {fileID: 0}
   weight: 40
   minRepeat: 1
-  maxRepeat: 1
+  maxRepeat: 2

@@ -53,8 +53,8 @@ public class TrainGenerator : MonoBehaviour
     // =========================================================
     // 이 오브젝트가 삭제되면
     // =========================================================
-    void OnDestroy()
-    {
-        RemoveTrain();
-    }
+    //void OnDestroy()
+    //{
+    //    RemoveTrain();
+    //}
 }

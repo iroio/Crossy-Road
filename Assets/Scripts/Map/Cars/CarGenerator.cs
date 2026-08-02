@@ -9,8 +9,8 @@ public class CarGenerator : MonoBehaviour
     [SerializeField] List<GameObject> _cars = new List<GameObject>();
 
     [Header("Spawn Delay min-max")]
-    [SerializeField] float _min = 0.1f;
-    [SerializeField] float _max = 2f;
+    [SerializeField] float _min = 2f;
+    [SerializeField] float _max = 4f;
 
     Transform _randomPoint;
 
@@ -36,16 +36,6 @@ public class CarGenerator : MonoBehaviour
     }
 
     // =========================================================
-    // 자동차 제거
-    // =========================================================
-    public void RemoveCar(CarMovement car)
-    {
-        car.gameObject.SetActive(false);
-        car.transform.rotation = Quaternion.identity;
-        _carsPools.Set(car);
-    }
-
-    // =========================================================
     // 자동차를 월드에 생성
     // =========================================================
     IEnumerator CoSpawnCars()
@@ -63,11 +53,21 @@ public class CarGenerator : MonoBehaviour
 
         while (true)
         {
-            _spawnDelay = Random.Range(_min, _max);
+            _spawnDelay = Random.Range(2f, _max);
             yield return new WaitForSeconds(_spawnDelay);
 
             SpawnCar(angle);
         }
+    }
+
+    // =========================================================
+    // 자동차 제거
+    // =========================================================
+    public void RemoveCar(CarMovement car)
+    {
+        car.gameObject.SetActive(false);
+        car.transform.rotation = Quaternion.identity;
+        _carsPools.Set(car);
     }
 
     // =========================================================

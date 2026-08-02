@@ -5,7 +5,6 @@ using System.Collections;
 public class PlayerController : MonoBehaviour
 {
     GameManager _gameManager;
-    LogMovement _logMovement;
     Transform _defaultParent;
 
     // =========================================================
@@ -171,47 +170,18 @@ public class PlayerController : MonoBehaviour
     }
 
     // =========================================================
-    // 장애물 여부 확인
-    // ========================================================= 
-    public bool IsObstacle(Vector3 dir)
-    {
-        _origin = transform.position;
-
-        if (Physics.Raycast(_origin, dir, out _hit, _maxDistance, _Obstacle)) 
-        {
-            return true;
-        }
-        return false;
-    }
-
-    // =========================================================
-    // 강 여부 확인
-    // =========================================================
-    public bool IsRiver()
-    {
-        Vector3 origin = transform.position + Vector3.up * 0.5f;
-
-        return Physics.Raycast(origin, Vector3.down, 2f, _layerRiver);
-    }
-
-    // =========================================================
-    // 자동차 충돌 여부 확인
-    // ========================================================= 
-    public void OnTriggerEnter(Collider other)
-    {
-        if(other.CompareTag("Car"))
-        {
-            _gameManager.GameOver();
-        }
-    }
-
-    // =========================================================
     // 점프 처리
     // ========================================================= 
     IEnumerator CoCharJump(Vector3 dir)
     {
         _isMoving = true;
         transform.SetParent(_defaultParent);
+
+        if(transform.position.x % 2 != 0)
+        {
+            float nearX = Mathf.Round(transform.position.x / 2f) * 2f;
+            transform.position = new Vector3(nearX, transform.position.y, transform.position.z);
+        }
 
         Vector3 startPos = transform.position;
         Vector3 endPos = startPos + dir * _moveDistance;
@@ -243,7 +213,6 @@ public class PlayerController : MonoBehaviour
         // 착지 후 탑승 검사
         CheckRide();
 
-        _logMovement = null;
         _isMoving = false;
     }
 
@@ -274,7 +243,21 @@ public class PlayerController : MonoBehaviour
     }
 
     // =========================================================
-    // 플렛폼 탑승 확인
+    // 장애물 여부 확인
+    // ========================================================= 
+    public bool IsObstacle(Vector3 dir)
+    {
+        _origin = transform.position;
+
+        if (Physics.Raycast(_origin, dir, out _hit, _maxDistance, _Obstacle))
+        {
+            return true;
+        }
+        return false;
+    }
+
+    // =========================================================
+    // 강 플렛폼 탑승 확인
     // =========================================================
     public bool CheckRide()
     {
@@ -301,6 +284,27 @@ public class PlayerController : MonoBehaviour
         }
 
         return true;
+    }
+
+    // =========================================================
+    // 자동차 & 기차 & AFK 여부 확인
+    // ========================================================= 
+    public void OnTriggerEnter(Collider other)
+    {
+        if (other.CompareTag("Car"))
+        {
+            _gameManager.GameOver();
+        }
+
+        if (other.CompareTag("Train"))
+        {
+            _gameManager.GameOver();
+        }
+
+        if (other.CompareTag("CameraTarget"))
+        {
+            _gameManager.GameOver();
+        }
     }
 
     // =========================================================

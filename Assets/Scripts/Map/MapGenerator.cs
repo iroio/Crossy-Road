@@ -1,8 +1,12 @@
 using System.Collections.Generic;
 using UnityEngine;
+using static Unity.Cinemachine.CinemachineSplineRoll;
 
 public class MapGenerator : MonoBehaviour
 {
+    [SerializeField] NatureGenerator _natureGenerator;
+    [SerializeField] Transform _root;
+
     /// <summary>
     /// 밝은 색 타일과 어두운 색 타일이 번갈아 나와야 함
     /// Scriptable Object로 번갈아 생성하는 것 보다
@@ -16,6 +20,7 @@ public class MapGenerator : MonoBehaviour
 
     int _currentZ = 2;
 
+    bool _isGrass = false;
     public int CurrentZ => _currentZ;
 
     // =========================================================
@@ -23,7 +28,11 @@ public class MapGenerator : MonoBehaviour
     // =========================================================
     public RowData GetRandomRow()
     {
-        int totalWeight = 0; // 가중치의 총 합
+        // 가중치의 총 합
+        int totalWeight = 0; 
+
+        // 비교용 변수
+        int currentWeight = 0;
 
         // List 전체 순회
         foreach (var row in _rowDatas)
@@ -34,9 +43,6 @@ public class MapGenerator : MonoBehaviour
 
         // 0~가중치 총합 사이의 값중 랜덤으로 숫자 하나 추출
         int randomValue = Random.Range(0, totalWeight);
-
-        // 비교용 변수
-        int currentWeight = 0;
 
         // 다시 전체 List 순회
         foreach (var row in _rowDatas)
@@ -56,7 +62,6 @@ public class MapGenerator : MonoBehaviour
             /// </summary>
             if (randomValue < currentWeight)
             {
-                //Debug.Log(row.rowType);
                 // 선택된 행 리턴
                 return row;
             }
@@ -94,16 +99,25 @@ public class MapGenerator : MonoBehaviour
                 // 홀수 행에 밝은 타일 배치
                 int rowIndex = _currentZ / 2;
 
-                prefabToSpawn = (rowIndex % 2 == 0) ? _darkGrassPrefab : _lightGrassPrefab; 
+                prefabToSpawn = (rowIndex % 2 == 0) ? _darkGrassPrefab : _lightGrassPrefab;
+
+                _isGrass = true;
             }
             else
             {
                 // 아니면 별도의 과정 없이 행 선택
                 prefabToSpawn = row.prefab;
+                _isGrass = false;
             }
 
             // 행 생성
-            GameObject newRow =  Instantiate(prefabToSpawn, new Vector3(0, 0, _currentZ), Quaternion.identity);
+            GameObject newRow =  Instantiate(prefabToSpawn, new Vector3(0, 0, _currentZ), Quaternion.identity, _root);
+
+            // Grass면 자연물 생성
+            if (_isGrass)
+            {
+                _natureGenerator.SpawnNatureGroup(newRow.transform);
+            }
 
             spawnedRows.Add(newRow);
 

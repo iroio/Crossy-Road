@@ -233,7 +233,7 @@ MonoBehaviour:
   _resetRange: 30
   _speed: 8
   _min: 5
-  _max: 6
+  _max: 10
 --- !u!65 &5868438795822000375
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -253,7 +253,7 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 2.6, y: 2.2, z: 5.8}
+  m_Size: {x: 2.6, y: 2.2, z: 4.8}
   m_Center: {x: 0, y: 1.15, z: 0}
 --- !u!1 &3481701644341497079
 GameObject:

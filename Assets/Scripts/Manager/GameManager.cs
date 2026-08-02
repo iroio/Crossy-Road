@@ -27,6 +27,31 @@ public class GameManager : MonoBehaviour
     public GameState CurrentState { get; private set; }
 
     // =========================================================
+    // 게임 상태 변경 
+    // =========================================================
+    public void ChangeState(GameState state)
+    {
+        CurrentState = state;
+
+        if (UIManager._UM == null) return;
+
+        switch (state)
+        {
+            case GameState.Main:
+                UIManager._UM.ShowMain();
+                break;
+
+            case GameState.Playing:
+                UIManager._UM.ShowPlaying();
+                break;
+
+            case GameState.GameOver:
+                UIManager._UM.ShowGameOver();
+                break;
+        }
+    }
+
+    // =========================================================
     // 점수 증가
     // =========================================================
     public void AddScore(int score)
@@ -78,31 +103,6 @@ public class GameManager : MonoBehaviour
     {
         _score = 0;
         ChangeState(GameState.Main);
-    }
-
-    // =========================================================
-    // 게임 상태 변경 
-    // =========================================================
-    public void ChangeState(GameState state)
-    {
-        CurrentState = state;
-
-        if (UIManager._UM == null) return;
-
-        switch (state)
-        {
-            case GameState.Main:
-                UIManager._UM.ShowMain();
-                break;
-
-            case GameState.Playing:
-                UIManager._UM.ShowPlaying();
-                break;
-
-            case GameState.GameOver:
-                UIManager._UM.ShowGameOver();
-                break;
-        }
     }
 
     // =========================================================

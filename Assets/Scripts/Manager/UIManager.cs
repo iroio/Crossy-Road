@@ -28,7 +28,7 @@ public class UIManager : MonoBehaviour
     bool _isLoading = false;
 
     // =========================================================
-    // 버튼 함수
+    // 버튼
     // =========================================================
     public void OnClickRetry()
     {

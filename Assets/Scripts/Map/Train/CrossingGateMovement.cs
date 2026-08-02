@@ -33,7 +33,6 @@ public class CrossingGateMovement : MonoBehaviour
     // =========================================================
     IEnumerator CoRail()
     {
-
         while (true)
         {
             _isEnd = false;

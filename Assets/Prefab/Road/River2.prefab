@@ -10063,8 +10063,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::LotusGenerator
   _root: {fileID: 5518006457024689987}
   _lotus: {fileID: 2090306605897589277, guid: 21e5aebb947fff44bb14ec4658348534, type: 3}
-  _lotusMin: 1
-  _lotusMax: 3
+  _lotusMin: 2
+  _lotusMax: 4
 --- !u!1 &8628563133751975635
 GameObject:
   m_ObjectHideFlags: 0

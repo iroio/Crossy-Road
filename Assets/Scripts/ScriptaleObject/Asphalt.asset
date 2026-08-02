@@ -16,4 +16,4 @@ MonoBehaviour:
   prefab: {fileID: 8434388503780023459, guid: c18c194dad36648449a360722bb3fa53, type: 3}
   weight: 40
   minRepeat: 1
-  maxRepeat: 2
+  maxRepeat: 1

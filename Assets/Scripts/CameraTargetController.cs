@@ -28,8 +28,8 @@ public class CameraTargetController : MonoBehaviour
     // =========================================================
     void Update()
     {
-        if (_gameManager.CurrentState == GameState.GameOver) return;
-        if (_gameManager.CurrentState == GameState.Main) return;
+        if (_gameManager.IsGameOver) return;
+        if (_gameManager.IsMain) return;
 
         transform.position += Vector3.forward * _speed * Time.deltaTime;
 

@@ -4,8 +4,6 @@ using UnityEngine.SceneManagement;
 
 public class ScenesManager : MonoBehaviour
 {
-    TitleMovement _loadingTitle;
-
     public static ScenesManager Instance;
 
     // =========================================================

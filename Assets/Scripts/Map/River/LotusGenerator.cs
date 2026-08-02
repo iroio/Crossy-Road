@@ -7,7 +7,7 @@ public class LotusGenerator : MonoBehaviour
     [SerializeField] GameObject _lotus;
 
     [Header("Lotus Spawn Count min-max")]
-    [SerializeField] int _lotusMin = 1;
+    [SerializeField] int _lotusMin = 2;
     [SerializeField] int _lotusMax = 4;
 
     int _randomCount;
@@ -28,16 +28,6 @@ public class LotusGenerator : MonoBehaviour
         lotus.transform.rotation = Quaternion.Euler(0f, angle, 0f);
 
         lotus.gameObject.SetActive(true);
-    }
-
-    // =========================================================
-    // 楷采蕾 力芭
-    // =========================================================
-    public void RemoveLotus(LotusMovement lotus)
-    {
-        lotus.gameObject.SetActive(false);
-        lotus.transform.rotation = Quaternion.identity;
-        _lotusPools.Set(lotus);
     }
 
     // =========================================================
@@ -66,6 +56,16 @@ public class LotusGenerator : MonoBehaviour
 
             SpawnLotus(angle, randomX);
         }
+    }
+
+    // =========================================================
+    // 楷采蕾 力芭
+    // =========================================================
+    public void RemoveLotus(LotusMovement lotus)
+    {
+        lotus.gameObject.SetActive(false);
+        lotus.transform.rotation = Quaternion.identity;
+        _lotusPools.Set(lotus);
     }
 
     // =========================================================
