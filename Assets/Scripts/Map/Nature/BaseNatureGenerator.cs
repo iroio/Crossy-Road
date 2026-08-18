@@ -7,11 +7,16 @@ public class BaseNatureGenerator : MonoBehaviour
     // =========================================================
     // 자연물 생성
     // =========================================================
-    public void SpawnBaseOut()
+    private void SpawnBase(int min, int max, bool center)
     {
-        for (int x = -20; x <= 20; x += 2)
+        for (int x = min; x <= max; x += 2)
         {
+            if (center && x > -12 && x < 12)
+                continue;
+
             Transform obj = _natureGenerator.GetNature();
+
+            if (obj == null) continue;
 
             obj.SetParent(transform);
 
@@ -20,21 +25,19 @@ public class BaseNatureGenerator : MonoBehaviour
     }
 
     // =========================================================
-    // 자연물 생성 내부 비우기
+    // 자연물 생성 외부
+    // =========================================================
+    public void SpawnBaseOut()
+    {
+        SpawnBase(-20, 20, false);
+    }
+
+    // =========================================================
+    // 자연물 생성 내부
     // =========================================================
     public void SpawnBaseIn()
     {
-        for (int x = -20; x <= 20; x += 2)
-        {
-            if (x > -12 && x < 12)
-                continue;
-
-            Transform obj = _natureGenerator.GetNature();
-
-            obj.SetParent(transform);
-
-            obj.position = new Vector3(x, 0f, transform.position.z);
-        }
+        SpawnBase(-20, 20, true);
     }
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created

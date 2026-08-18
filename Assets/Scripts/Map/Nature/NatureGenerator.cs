@@ -16,31 +16,25 @@ public class NatureGenerator : MonoBehaviour
     List<int> _naturePos = new List<int>();
 
     // =========================================================
-    // 자연물 Get()
+    // Pool 선택
     // =========================================================
-    public Transform GetNature()
+    private GameObjectPool<Transform> GetNaturePool()
     {
         int random = Random.Range(0, _naturesPools.Length);
 
-        Transform obj = _naturesPools[random].Get();
-
-        obj.gameObject.SetActive(true);
-
-        return obj;
+        return _naturesPools[random];
     }
 
     // =========================================================
     // 자연물 프리팹 생성
     // =========================================================
-    public void SpawnNature(Transform row, int x)
+    public Transform GetNature()
     {
-        int random = Random.Range(0, _naturesPools.Length);
-
-        GameObjectPool<Transform> pool = _naturesPools[random];
+        GameObjectPool<Transform> pool = GetNaturePool();
 
         Transform obj = pool.Get();
 
-        if (obj == null) return;
+        if (obj == null) return null;
 
         NaturesReturn natures = obj.GetComponent<NaturesReturn>();
 
@@ -49,11 +43,23 @@ public class NatureGenerator : MonoBehaviour
             natures.SetPool(pool);
         }
 
-        obj.transform.position = new Vector3(x, 0f, row.position.z);
+        obj.gameObject.SetActive(true);
+
+        return obj;
+    }
+
+    // =========================================================
+    // 자연물 프리팹 생성 (위치지정 O)
+    // =========================================================
+    public void SpawnNature(Transform row, int x)
+    {
+        Transform obj = GetNature();
+
+        if (obj == null) return;
+
+        obj.position = new Vector3(x, 0f, row.position.z);
 
         obj.SetParent(_root);
-
-        obj.gameObject.SetActive(true);
     }
 
     // =========================================================
@@ -119,7 +125,9 @@ public class NatureGenerator : MonoBehaviour
         natures.ReturnNature();
     }
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
+    // =========================================================
+    // Awake (Pooling)
+    // =========================================================
     void Awake()
     {
         _naturesPools = new GameObjectPool<Transform>[_natures.Length];
