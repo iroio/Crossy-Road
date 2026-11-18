@@ -1,11 +1,10 @@
 using System.Collections;
 using UnityEngine;
 
-public class FadeManager : MonoBehaviour
+public class FadeManager : Singleton<FadeManager>
 {
-    public static FadeManager Instance;
-
     [SerializeField] CanvasGroup _canvasGroup;
+    public bool IsConfigured => _canvasGroup != null; // ¼öÁ¤
 
     [SerializeField] float _fadeTime = 0.5f;
 
@@ -45,22 +44,5 @@ public class FadeManager : MonoBehaviour
         }
 
         _canvasGroup.alpha = 1f;
-    }
-
-    // =========================================================
-    // Awake ¹× ½Ì±ÛÅæ
-    // =========================================================
-    void Awake()
-    {
-        if(Instance == null)
-        {
-            Instance = this;
-
-            DontDestroyOnLoad(gameObject);
-        }
-        else
-        {
-            Destroy(gameObject);
-        }
     }
 }

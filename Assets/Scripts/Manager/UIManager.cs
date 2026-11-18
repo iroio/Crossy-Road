@@ -32,11 +32,8 @@ public class UIManager : MonoBehaviour
     // =========================================================
     public void OnClickRetry()
     {
-        if (ScenesManager.Instance == null)
-        {
-            Debug.LogError("Cannot load the Game scene without a ScenesManager.", this);
-            return;
-        }
+        if (ScenesManager.Instance == null) return;
+
         ScenesManager.Instance.LoadScene("Game");
     }
 
@@ -104,7 +101,14 @@ public class UIManager : MonoBehaviour
     // =========================================================
     public void Awake()
     {
-        _UM = this;
+        if(_UM == null)
+        {
+            _UM = this;
+        }
+        else if(_UM != this)
+        {
+            Destroy(gameObject);
+        }
     }
 
     // =========================================================
@@ -112,7 +116,7 @@ public class UIManager : MonoBehaviour
     // =========================================================
     void Start()
     {
-        GameManager._GM.ChangeState(GameState.Main);
+        GameManager.Instance.ChangeState(GameState.Main);
     }
 
     // =========================================================
@@ -120,9 +124,9 @@ public class UIManager : MonoBehaviour
     // =========================================================
     void Update()
     {
-        if (!GameManager._GM.IsMain) return;
+        if (!GameManager.Instance.IsMain) return;
 
-        Mouse mouse = Mouse.current;
+        MouseManager mouse = MouseManager.Instance;
         if (mouse == null)
         {
             if (!_mouseMissing)
@@ -132,9 +136,9 @@ public class UIManager : MonoBehaviour
         }
 
         _mouseMissing = false;
-        if (mouse.leftButton.wasPressedThisFrame)
+        if (mouse.IsClicking())
         {
-            GameManager._GM.StartGame();
+            GameManager.Instance.StartGame();
 
             StartCoroutine(_titleMovement.CoMoveOut());
         }

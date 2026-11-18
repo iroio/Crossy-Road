@@ -10,10 +10,8 @@ public enum GameState
     GameOver
 }
 
-public class GameManager : MonoBehaviour
+public class GameManager : Singleton<GameManager>
 {
-    public static GameManager _GM;
-
     int _score = 0;
     int _highScore;
     float? _furthestZ;
@@ -129,18 +127,8 @@ public class GameManager : MonoBehaviour
     // =========================================================
     // Awake ¹× ½Ì±ÛÅæ Àû¿ë 
     // =========================================================
-    private void Awake()
+    private void Start()
     {
-        if (_GM == null)
-        {
-            _GM = this;
-            DontDestroyOnLoad(gameObject);
-        }
-        else
-        {
-            Destroy(gameObject);
-        }
-
         _highScore = PlayerPrefs.GetInt("HighScore", 0);
 
         CurrentState = GameState.Main;

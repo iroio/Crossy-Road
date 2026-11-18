@@ -37,7 +37,7 @@ public class LodingManager_Del : MonoBehaviour
             yield return null;
         }
 
-        GameManager._GM.ResetGame();
+        GameManager.Instance.ResetGame();
 
         yield return StartCoroutine(FadeManager.Instance.CoFadeIn());
     }

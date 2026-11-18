@@ -20,7 +20,7 @@ public class CameraTargetController : MonoBehaviour
     // =========================================================
     void Start()
     {
-        _gameManager = GameManager._GM;
+        _gameManager = GameManager.Instance;
     }
 
     // =========================================================

@@ -50,6 +50,15 @@ public class CarMovement : MonoBehaviour
     // =========================================================
     // 정면 충돌 확인
     // =========================================================
+
+    // =========================================================
+    // 상태 리셋
+    // =========================================================
+    public void ResetState()
+    {
+        _targetSpeed = 0f;
+        _isFrontCarDetected = false;
+    }
     public void CheckFront()
     {
         _origin = new Vector3(transform.position.x, 0.5f, transform.position.z);
@@ -125,3 +134,4 @@ void Start()
         );
     }
 }
+

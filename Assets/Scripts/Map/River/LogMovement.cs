@@ -19,7 +19,7 @@ public class LogMovement : RidePlatform
     [SerializeField] float _max = 4f;
 
     // =========================================================
-    // 초기화
+    // Initialize
     // =========================================================
     public void InitLog(LogGenerator log)
     {
@@ -27,8 +27,12 @@ public class LogMovement : RidePlatform
     }
 
     // =========================================================
-    // 방향 지정
+    // ResetState
     // =========================================================
+    public void ResetState()
+    {
+        _moveRight = false;
+    }
     public void SetDirection(bool moveRight)
     {
         _moveRight = moveRight;
@@ -67,3 +71,4 @@ public class LogMovement : RidePlatform
         }
     }
 }
+

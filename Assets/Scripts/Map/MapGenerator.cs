@@ -6,6 +6,8 @@ public class MapGenerator : MonoBehaviour
     [SerializeField] NatureGenerator _natureGenerator;
     [SerializeField] Transform _root;
 
+    [SerializeField] int _initialSize = 10;
+
     /// <summary>
     /// 밝은 색 타일과 어두운 색 타일이 번갈아 나와야 함
     /// Scriptable Object로 번갈아 생성하는 것 보다
@@ -170,13 +172,9 @@ public class MapGenerator : MonoBehaviour
 
         if (!_rowPools.TryGetValue(prefab, out GameObjectPool<Transform> pool))
         {
-            pool = new GameObjectPool<Transform>(0, () =>
-            {
-                GameObject instance = Instantiate(prefab, _inactiveRowsRoot);
-                instance.SetActive(false);
-                _rowPrefabs.Add(instance, prefab);
-                return instance.transform;
-            });
+            pool = new GameObjectPool<Transform>(
+                prefab.transform, _inactiveRowsRoot, _initialSize);
+
             _rowPools.Add(prefab, pool);
         }
 
@@ -199,7 +197,7 @@ public class MapGenerator : MonoBehaviour
 
         row.SetActive(false);
         row.transform.SetParent(_inactiveRowsRoot, false);
-        _rowPools[prefab].Set(row.transform);
+        _rowPools[prefab].Return(row.transform);
         return true;
     }
 }

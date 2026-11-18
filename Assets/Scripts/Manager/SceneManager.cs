@@ -2,9 +2,8 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class ScenesManager : MonoBehaviour
+public class ScenesManager : Singleton<ScenesManager>
 {
-    public static ScenesManager Instance;
     bool _isLoading;
     bool _loadSucceeded;
 
@@ -13,26 +12,19 @@ public class ScenesManager : MonoBehaviour
     // =========================================================
     public void LoadScene(string sceneName)
     {
-        if (_isLoading)
-        {
-            Debug.LogWarning("A scene transition is already in progress.", this);
-            return;
-        }
+        if (_isLoading) return;
+        if (string.IsNullOrWhiteSpace(sceneName) || !Application.CanStreamedLevelBeLoaded(sceneName)) return;
+        if (!Application.CanStreamedLevelBeLoaded("Load")) return;
 
-        if (string.IsNullOrWhiteSpace(sceneName) || !Application.CanStreamedLevelBeLoaded(sceneName))
+        FadeManager fadeManager = FindAnyObjectByType<FadeManager>(); // 수정
+        if (fadeManager == null || !fadeManager.IsConfigured) // 수정
         {
-            Debug.LogError($"Cannot load scene '{sceneName}': it is not available in the build settings.", this);
-            return;
-        }
-
-        if (!Application.CanStreamedLevelBeLoaded("Load") || FadeManager.Instance == null)
-        {
-            Debug.LogError("Scene transition requires the Load scene and FadeManager.", this);
-            return;
+            Debug.LogError("Scene transition requires a configured FadeManager.", this); // 수정
+            return; // 수정
         }
 
         _isLoading = true;
-        StartCoroutine(CoLoadScene(sceneName));
+        StartCoroutine(CoLoadScene(sceneName, fadeManager)); // 수정
     }
 
     // =========================================================
@@ -43,7 +35,6 @@ public class ScenesManager : MonoBehaviour
         _loadSucceeded = false;
         if (!Application.CanStreamedLevelBeLoaded(sceneName))
         {
-            Debug.LogError($"Cannot load scene '{sceneName}': it is not available in the build settings.", this);
             yield break;
         }
 
@@ -64,7 +55,6 @@ public class ScenesManager : MonoBehaviour
 
         if (op == null)
         {
-            Debug.LogError($"Failed to load scene '{sceneName}': {error ?? "no load operation was returned"}.", this);
             yield break;
         }
 
@@ -93,20 +83,20 @@ public class ScenesManager : MonoBehaviour
     // =========================================================
     // 페이드 인 아웃 흐름
     // =========================================================
-    IEnumerator CoLoadScene(string sceneName)
+    IEnumerator CoLoadScene(string sceneName, FadeManager fadeManager) // 수정
     {
         string previousScene = SceneManager.GetActiveScene().path;
         try
         {
             // 페이드 아웃
             Debug.Log("FadeOut Start");
-            yield return StartCoroutine(FadeManager.Instance.CoFadeOut());
+            yield return StartCoroutine(fadeManager.CoFadeOut()); // 수정
 
             // Load 씬 이동
             yield return StartCoroutine(Load("Load"));
             if (!_loadSucceeded)
             {
-                yield return StartCoroutine(FadeManager.Instance.CoFadeIn());
+                yield return StartCoroutine(fadeManager.CoFadeIn()); // 수정
                 yield break;
             }
 
@@ -131,34 +121,20 @@ public class ScenesManager : MonoBehaviour
             // 초기화
             if (_loadSucceeded && SceneManager.GetActiveScene().name == "Game")
             {
-                if (GameManager._GM != null)
-                    GameManager._GM.ResetGame();
+                if (GameManager.Instance != null)
+                {
+                    GameManager.Instance.ResetGame();
+                }
                 else
                     Debug.LogError("The Game scene has no GameManager.", this);
             }
 
             // 페이드 인
-            yield return StartCoroutine(FadeManager.Instance.CoFadeIn());
+            yield return StartCoroutine(fadeManager.CoFadeIn()); // 수정
         }
         finally
         {
             _isLoading = false;
-        }
-    }
-
-    // =========================================================
-    // Awake 및 싱글톤 적용
-    // =========================================================
-    void Awake()
-    {
-        if (Instance == null)
-        {
-            Instance = this;
-            DontDestroyOnLoad(gameObject);
-        }
-        else
-        {
-            Destroy(gameObject);
         }
     }
 }

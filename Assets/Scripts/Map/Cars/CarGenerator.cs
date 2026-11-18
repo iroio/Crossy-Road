@@ -8,7 +8,7 @@ public class CarGenerator : MonoBehaviour
     [SerializeField] Transform[] _spawnPoints;
     [SerializeField] List<GameObject> _cars = new List<GameObject>();
 
-    [SerializeField] int _initialPoolSize = 10;
+    [SerializeField] int _initialSize = 10;
 
     [Header("Spawn Delay min-max")]
     [SerializeField] float _min = 2f;
@@ -67,9 +67,8 @@ public class CarGenerator : MonoBehaviour
     // =========================================================
     public void RemoveCar(CarMovement car)
     {
-        car.gameObject.SetActive(false);
-        car.transform.rotation = Quaternion.identity;
-        _carsPools.Set(car);
+        car.ResetState();
+        _carsPools.Return(car);
     }
 
     // =========================================================
@@ -102,19 +101,11 @@ public class CarGenerator : MonoBehaviour
         }
 
         // Pooling
+        CarMovement car = _cars[Random.Range(0, _cars.Count)].GetComponent<CarMovement>();
         if (_carsPools == null)
         {
-            _carsPools = new GameObjectPool<CarMovement>(_initialPoolSize, () =>
-            {
-                GameObject prefab = _cars[Random.Range(0, _cars.Count)];
-
-                GameObject instance = Instantiate(prefab, _root);
-                instance.SetActive(false);
-                CarMovement car = instance.GetComponent<CarMovement>();
-                car.InitCar(this);
-
-                return car;
-            });
+            _carsPools = new GameObjectPool<CarMovement>(
+                car, _root, _initialSize, car => car.InitCar(this));
         }
 
         _isLeft = Random.Range(0, 2) == 0;
@@ -136,3 +127,4 @@ public class CarGenerator : MonoBehaviour
         }
     }
 }
+

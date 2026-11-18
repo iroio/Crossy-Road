@@ -6,6 +6,8 @@ public class NatureGenerator : MonoBehaviour
     [SerializeField] GameObject[] _natures;
     [SerializeField] Transform _root;
 
+    [SerializeField] int _initialSize = 10;
+
     [Header("Natures Spawn Count min-max")]
     [SerializeField] int _naturesMin = 1;
     [SerializeField] int _naturesMax = 4;
@@ -144,12 +146,8 @@ public class NatureGenerator : MonoBehaviour
         {
             GameObject prefab = _natures[i];
 
-            _naturesPools[i] = new GameObjectPool<Transform>(5, () =>
-            {
-                Transform obj = Instantiate(prefab).transform;
-                obj.gameObject.SetActive(false);
-                return obj;
-            });
+            _naturesPools[i] = new GameObjectPool<Transform>(
+                prefab.transform, _root, _initialSize);
         }
     }
 }

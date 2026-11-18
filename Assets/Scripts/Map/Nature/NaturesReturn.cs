@@ -14,6 +14,6 @@ public class NaturesReturn : MonoBehaviour
         gameObject.SetActive(false);
         transform.rotation = Quaternion.identity;
 
-        _pool.Set(transform);
+        _pool.Return(transform);
     }
 }

@@ -4,7 +4,8 @@
       "type": "stdio",
       "command": "C:\\Users\\mipip\\AppData\\Local\\Unity\\bin\\unity.exe",
       "args": [
-        "mcp"
+        "mcp",
+        "--tool-groups"
       ]
     }
   }

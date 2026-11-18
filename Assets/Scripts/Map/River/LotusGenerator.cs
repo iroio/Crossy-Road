@@ -6,6 +6,8 @@ public class LotusGenerator : MonoBehaviour
     [SerializeField] Transform _root;
     [SerializeField] GameObject _lotus;
 
+    [SerializeField] int _initialSize = 10;
+
     [Header("Lotus Spawn Count min-max")]
     [SerializeField] int _lotusMin = 2;
     [SerializeField] int _lotusMax = 4;
@@ -75,7 +77,7 @@ public class LotusGenerator : MonoBehaviour
 
         lotus.gameObject.SetActive(false);
         lotus.transform.rotation = Quaternion.identity;
-        _lotusPools.Set(lotus);
+        _lotusPools.Return(lotus);
     }
 
     // =========================================================
@@ -85,14 +87,9 @@ public class LotusGenerator : MonoBehaviour
     {
         if (_lotusPools == null)
         {
-            _lotusPools = new GameObjectPool<LotusMovement>(3, () =>
-            {
-                var obj = Instantiate(_lotus, _root);
-                obj.SetActive(false);
-
-                var lotus = obj.GetComponent<LotusMovement>();
-                return lotus;
-            });
+            _lotusPools = new GameObjectPool<LotusMovement>(
+                _lotus.GetComponentInChildren<LotusMovement>(), 
+                _root, _initialSize, lotus => lotus.InitLotus(this));
         }
 
         SpawnLotusGroup();

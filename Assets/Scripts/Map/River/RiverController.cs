@@ -5,10 +5,14 @@ public class RiverController : MonoBehaviour
 {
     [SerializeField] GameObject _splashPrefab;
 
+    [SerializeField] int _initialSize = 5;
+
     GameManager _gameManager;
 
+    GameObjectPool<ParticleSystem> _splashPool;
+
     // =========================================================
-    // ƒ≥∏Ø≈Õ ≥ª∏Æ±‚
+    // Sink the character
     // =========================================================
     IEnumerator Sink(Transform target)
     {
@@ -25,26 +29,57 @@ public class RiverController : MonoBehaviour
     }
 
     // =========================================================
-    // ∞‘¿”ø¿πˆ ø©∫Œ »Æ¿Œ
+    // OnTriggerEnter
     // ========================================================= 
     void OnTriggerEnter(Collider other)
     {
         PlayerController player = other.GetComponentInParent<PlayerController>();
 
-        // ¡ﬂ∫π Ω««‡ πÊ¡ˆ
         if (player == null) return;
 
-        // ≈Î≥™π´?
         if (player.CheckRide()) return;
 
         _gameManager.GameOver();
 
-        // ∞‘¿”ø¿πˆ ∆«¡§ ¿Ã»ƒ ¡¯«‡«“ ∑Œ¡˜
-        // ¿Ã∆Â∆Æ ª˝º∫
-        Instantiate(_splashPrefab, player.transform.position, _splashPrefab.transform.rotation);
+        PlaySplash(player.transform.position);
 
-        // ¿ßƒ° ≥ª∏Æ±‚
         StartCoroutine(Sink(player.transform));
+    }
+
+    // =========================================================
+    // PlaySplash
+    // =========================================================
+    void PlaySplash(Vector3 position)
+    {
+        if (_splashPool == null) return;
+
+        ParticleSystem splash = _splashPool.Get();
+        if (splash == null) return;
+
+        splash.transform.position = position;
+        splash.Play();
+        
+        StartCoroutine(ReturnSplashAfterDelay(splash, 2f));
+    }
+
+    // =========================================================
+    // ÏùºÏ†ï ÏãúÍ∞Ñ ÌõÑ Splash Î∞òÌôò
+    // =========================================================
+    IEnumerator ReturnSplashAfterDelay(ParticleSystem splash, float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        
+        if (_splashPool != null && splash != null)
+        {
+            _splashPool.Return(splash);
+        }
+    }
+
+    private void OnEnable()
+    {
+        ParticleSystem splash = _splashPrefab.GetComponentInChildren<ParticleSystem>();
+        _splashPool = new GameObjectPool<ParticleSystem>(
+            splash, transform, _initialSize, splash => splash.Play());
     }
 
     // =========================================================
@@ -52,6 +87,6 @@ public class RiverController : MonoBehaviour
     // =========================================================
     void Start()
     {
-        _gameManager = GameManager._GM;
+        _gameManager = GameManager.Instance;
     }
 }

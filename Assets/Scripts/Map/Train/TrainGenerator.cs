@@ -3,7 +3,10 @@ using UnityEngine;
 public class TrainGenerator : MonoBehaviour
 {
     [SerializeField] Transform _train;
+    [SerializeField] Transform _root;
     [SerializeField] Transform[] _spawnPoints;
+
+    [SerializeField] int _initialSize = 1;
 
     Transform _randomPoint;
     Transform _currentTrain;
@@ -12,31 +15,46 @@ public class TrainGenerator : MonoBehaviour
 
     public Transform CurrentTrain => _currentTrain;
 
+    GameObjectPool<TrainMovement> _trainPool;
+
     // =========================================================
-    // 기차 생성
+    // SpawnTrain
     // =========================================================
     public void SpawnTrain()
     {
-        if (_train == null) return;
+        if (_trainPool == null) return;
         if (_currentTrain != null) return;
 
         float angle = _randomPoint == _spawnPoints[0] ? 90f : -90f;
-
         if (_randomPoint == null) return;
 
-        _currentTrain = Instantiate(_train, _randomPoint.position, Quaternion.Euler(0f, angle, 0f));
+        TrainMovement train = _trainPool.Get();
+        
+        if (train == null)
+        {
+            Debug.LogWarning("Failed to get train from pool.", this);
+            return;
+        }
 
-        _currentTrain.GetComponent<TrainMovement>().InitTrain(this);
+        train.transform.position = _randomPoint.position;
+        train.transform.rotation = Quaternion.Euler(0f, angle, 0f);
+        
+        _currentTrain = train.transform;
     }
 
     // =========================================================
-    // 기차 삭제
+    // RemoveTrain
     // =========================================================
     public void RemoveTrain()
     {
-        if (_currentTrain == null)  return;
+        if (_currentTrain == null) return;
 
-        Destroy(_currentTrain.gameObject);
+        TrainMovement train = _currentTrain.GetComponent<TrainMovement>();
+        if (train != null && _trainPool != null)
+        {
+            _trainPool.Return(train);
+        }
+        
         _currentTrain = null;
     }
 
@@ -45,8 +63,17 @@ public class TrainGenerator : MonoBehaviour
     // =========================================================
     void OnEnable()
     {
-        _isLeft = Random.Range(0, 2) == 0;
+        if (_trainPool == null && _train != null)
+        {
+            TrainMovement train = _train.GetComponent<TrainMovement>();
+            if (train != null)
+            {
+                _trainPool = new GameObjectPool<TrainMovement>(
+                    train, _root, _initialSize, train => train.InitTrain(this));
+            }
+        }
 
+        _isLeft = Random.Range(0, 2) == 0;
         _randomPoint = _isLeft ? _spawnPoints[0] : _spawnPoints[1];
     }
 

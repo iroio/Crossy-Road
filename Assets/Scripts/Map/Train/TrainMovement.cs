@@ -10,9 +10,9 @@ public class TrainMovement : MonoBehaviour
     // =========================================================
     // √ ±‚»≠
     // =========================================================
-    public void InitTrain(TrainGenerator generator)
+    public void InitTrain(TrainGenerator train)
     {
-        _trainGenerator = generator;
+        _trainGenerator = train;
     }
 
     // =========================================================

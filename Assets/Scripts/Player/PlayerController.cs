@@ -1,10 +1,10 @@
 ﻿using UnityEngine;
-using UnityEngine.InputSystem;
 using System.Collections;
 
 public class PlayerController : MonoBehaviour
 {
     GameManager _gameManager;
+    MouseManager _mouseManager;
     Transform _defaultParent;
 
     // =========================================================
@@ -28,7 +28,7 @@ public class PlayerController : MonoBehaviour
     float _floorY = 0f;
 
     // =========================================================
-    // 마우스 위치 체크
+    // 마우스
     // =========================================================
     Vector2 _startMpos;
     Vector2 _nextMpos;
@@ -51,7 +51,7 @@ public class PlayerController : MonoBehaviour
     // 상태 체크
     // =========================================================
     bool _isMoving = false;
-    bool _mouseMissing;
+    bool _isSwiping = false;
 
     public bool isLog => transform.parent != _defaultParent;
 
@@ -67,37 +67,28 @@ public class PlayerController : MonoBehaviour
     // =========================================================
     public void SwipeInput()
     {
-        Mouse mouse = GetMouse();
-        if (mouse == null) return;
+        Vector2 mousePos = _mouseManager.GetMousePosition();
+        if (mousePos == Vector2.zero) return;
 
-        if (mouse.leftButton.wasPressedThisFrame)
+        if (_mouseManager.IsClicking())
         {
-            Vector2 pos = mouse.position.ReadValue();
+            Vector2 pos = mousePos;
             _startMpos = new Vector3(pos.x, pos.y, 0f);
+            _isSwiping = true;
         }
 
-        if (mouse.leftButton.wasReleasedThisFrame)
+        if(_mouseManager.IsHolding() && _isSwiping)
         {
-            Vector2 pos = mouse.position.ReadValue();
+            Vector2 pos = mousePos;
             _nextMpos = new Vector3(pos.x, pos.y, 0f);
         }
-    }
 
-    Mouse GetMouse()
-    {
-        Mouse mouse = Mouse.current;
-        if (mouse == null)
+        if (_mouseManager.IsReleasing() && _isSwiping)
         {
-            if (!_mouseMissing)
-                Debug.LogWarning("Player input requires a mouse.", this);
-            _mouseMissing = true;
+            Vector2 pos = mousePos;
+            _nextMpos = new Vector3(pos.x, pos.y, 0f);
+            _isSwiping = false;
         }
-        else
-        {
-            _mouseMissing = false;
-        }
-
-        return mouse;
     }
 
     // =========================================================
@@ -299,7 +290,6 @@ public class PlayerController : MonoBehaviour
         RidePlatform platform = _hit.collider.GetComponentInParent<RidePlatform>();
         if (platform == null)
         {
-            Debug.LogError("A collider on LayerRide has no RidePlatform component in its hierarchy.", _hit.collider);
             _gameManager.GameOver();
             return false;
         }
@@ -353,7 +343,8 @@ public class PlayerController : MonoBehaviour
     // =========================================================
     void Start()
     {
-        _gameManager = GameManager._GM;
+        _gameManager = GameManager.Instance;
+        _mouseManager = MouseManager.Instance;
 
         _defaultParent = transform.parent;
 
@@ -369,17 +360,10 @@ public class PlayerController : MonoBehaviour
     {
         if (_gameManager.IsGameOver) return;
 
-        Mouse mouse = GetMouse();
-        if (mouse == null)
-        {
-            ScaleSize(false);
-            return;
-        }
-
         SwipeInput();
 
         // 플레이어 점프 준비 동작
-        if (mouse.leftButton.IsPressed())
+        if (_mouseManager.IsClicking())
         {
             ScaleSize(true);
         }
@@ -388,7 +372,7 @@ public class PlayerController : MonoBehaviour
             ScaleSize(false);
         }
 
-        if (mouse.leftButton.wasReleasedThisFrame)
+        if (_mouseManager.IsReleasing())
         {
             SwipeDir();
         }

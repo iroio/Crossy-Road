@@ -7,6 +7,8 @@ public class LogGenerator : MonoBehaviour
     [SerializeField] Transform[] _spawnPoints;
     [SerializeField] GameObject _log;
 
+    [SerializeField] int _initialSize = 10;
+
     [Header("Spawn Delay min-max")]
     [SerializeField] float _min = 0.1f;
     [SerializeField] float _max = 2f;
@@ -20,7 +22,7 @@ public class LogGenerator : MonoBehaviour
     bool _isLeft;
 
     // =========================================================
-    // 烹唱公 橇府普 积己
+    // SpawnLog
     // =========================================================
     public void SpawnLog(float angle)
     {
@@ -40,7 +42,7 @@ public class LogGenerator : MonoBehaviour
     }
 
     // =========================================================
-    // 烹唱公 力芭
+    // RemoveLog
     // =========================================================
     public void RemoveLog(LogMovement log)
     {
@@ -48,13 +50,12 @@ public class LogGenerator : MonoBehaviour
         if (rider != null)
             rider.RemoveFromPlatform();
 
-        log.gameObject.SetActive(false);
-        log.transform.rotation = Quaternion.identity;
-        _logsPools.Set(log);
+        log.ResetState();
+        _logsPools.Return(log);
     }
 
     // =========================================================
-    // 烹唱公 积己
+    // SpawnLog
     // =========================================================
     IEnumerator CoSpawnLog()
     {
@@ -83,18 +84,11 @@ public class LogGenerator : MonoBehaviour
     // =========================================================
     void OnEnable()
     {
+        LogMovement log = _log.GetComponentInChildren<LogMovement>();
         if (_logsPools == null)
         {
-            _logsPools = new GameObjectPool<LogMovement>(5, () =>
-            {
-                var obj = Instantiate(_log, _root);
-                obj.SetActive(false);
-
-                var log = obj.GetComponentInChildren<LogMovement>();
-                log.InitLog(this);
-
-                return log;
-            });
+            _logsPools = new GameObjectPool<LogMovement>(
+                log, _root, _initialSize, log => log.InitLog(this));
         }
 
         _isLeft = Random.Range(0, 2) == 0;
@@ -116,3 +110,4 @@ public class LogGenerator : MonoBehaviour
         }
     }
 }
+
