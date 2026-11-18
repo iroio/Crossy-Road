@@ -23,13 +23,13 @@ public class CarGenerator : MonoBehaviour
     bool _isLeft;
 
     // =========================================================
-    // 자동차 프리팹 생성
+    // SpawnCar
     // =========================================================
     public void SpawnCar(float angle)
     {
         var car = _carsPools.Get();
 
-        if(car == null) return;
+        if (car == null) return;
 
         car.transform.position = _randomPoint.position;
         car.transform.rotation = Quaternion.Euler(0f, angle, 0f);
@@ -38,7 +38,7 @@ public class CarGenerator : MonoBehaviour
     }
 
     // =========================================================
-    // 자동차를 월드에 생성
+    // CoSpawnCars
     // =========================================================
     IEnumerator CoSpawnCars()
     {
@@ -63,7 +63,7 @@ public class CarGenerator : MonoBehaviour
     }
 
     // =========================================================
-    // 자동차 제거
+    // RemoveCar
     // =========================================================
     public void RemoveCar(CarMovement car)
     {
@@ -108,9 +108,8 @@ public class CarGenerator : MonoBehaviour
                 car, _root, _initialSize, car => car.InitCar(this));
         }
 
-        _isLeft = Random.Range(0, 2) == 0;
-
-        _randomPoint = _isLeft ? _spawnPoints[0] : _spawnPoints[1];
+        _randomPoint = Random.Range(0, 2) == 0
+            ? _spawnPoints[0] : _spawnPoints[1];
 
         StartCoroutine(CoSpawnCars());
     }
@@ -127,4 +126,3 @@ public class CarGenerator : MonoBehaviour
         }
     }
 }
-

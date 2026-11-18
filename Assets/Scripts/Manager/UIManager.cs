@@ -96,6 +96,12 @@ public class UIManager : MonoBehaviour
         _ButtonPanel.SetActive(true);
     }
 
+    public void OnDestroy()
+    {
+        if(_UM == this)
+            _UM = null;
+    }
+
     // =========================================================
     // Awake
     // =========================================================

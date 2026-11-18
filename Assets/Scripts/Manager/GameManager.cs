@@ -57,8 +57,7 @@ public class GameManager : Singleton<GameManager>
     {
         _score += score;
 
-        if(UIManager._UM != null)
-            UIManager._UM.ChangeScore(_score);
+        UIManager._UM.ChangeScore(_score);
     }
 
     public void RecordProgress(float startZ, float endZ)
@@ -111,8 +110,7 @@ public class GameManager : Singleton<GameManager>
         }
 
         //Result 텍스트 출력
-        if (UIManager._UM != null)
-            UIManager._UM.GameOverResult(_highScore);
+        UIManager._UM.GameOverResult(_highScore);
     }
 
     // =========================================================
@@ -125,7 +123,7 @@ public class GameManager : Singleton<GameManager>
     }
 
     // =========================================================
-    // Awake 및 싱글톤 적용 
+    // Awake
     // =========================================================
     private void Start()
     {
