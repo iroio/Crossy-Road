@@ -76,23 +76,29 @@ public class CrossingGateMovement : MonoBehaviour
     }
 
     // =========================================================
-    // Start
+    // Initialization
     // =========================================================
-    void Start()
+    void Awake()
     { 
         _animator = GetComponent<Animator>();
+    }
 
+    void OnEnable()
+    {
+        _isEnd = false;
+        _animator.Rebind();
         SetPosition();
 
-        if(_corail == null)
-            _corail = StartCoroutine(CoRail());
+        _corail = StartCoroutine(CoRail());
     }
 
     // =========================================================
     // 이 오브젝트가 삭제되면
     // =========================================================
-    void OnDestroy()
+    void OnDisable()
     {
-        StopAllCoroutines();
+        if (_corail != null)
+            StopCoroutine(_corail);
+        _corail = null;
     }
 }

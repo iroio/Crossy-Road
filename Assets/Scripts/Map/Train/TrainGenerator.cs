@@ -41,9 +41,9 @@ public class TrainGenerator : MonoBehaviour
     }
 
     // =========================================================
-    // Awake
+    // OnEnable
     // =========================================================
-    void Awake()
+    void OnEnable()
     {
         _isLeft = Random.Range(0, 2) == 0;
 
@@ -53,8 +53,13 @@ public class TrainGenerator : MonoBehaviour
     // =========================================================
     // 이 오브젝트가 삭제되면
     // =========================================================
-    //void OnDestroy()
-    //{
-    //    RemoveTrain();
-    //}
+    void OnDestroy()
+    {
+        RemoveTrain();
+    }
+
+    void OnDisable()
+    {
+        RemoveTrain();
+    }
 }

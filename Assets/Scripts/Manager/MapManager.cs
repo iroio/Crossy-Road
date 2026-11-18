@@ -6,8 +6,6 @@ public class MapManager : MonoBehaviour
     [SerializeField] MapGenerator _generator;
     [SerializeField] Transform _player;
 
-    [SerializeField] int _startRowCount = 20;
-
     [SerializeField] float _frontBuffer = 30f;
     [SerializeField] float _removeDistance = 20f;
 
@@ -16,14 +14,24 @@ public class MapManager : MonoBehaviour
     // =========================================================
     // 행 생성
     // =========================================================
-    void AddRows()
+    bool AddRows()
     {
+        int previousZ = _generator.CurrentZ;
         List<GameObject> newRows = _generator.SpawnRow();
+
+        if (_generator.CurrentZ <= previousZ)
+        {
+            Debug.LogError("Map generation did not advance; disabling MapManager.", this);
+            enabled = false;
+            return false;
+        }
 
         foreach (GameObject row in newRows)
         {
             _rows.Enqueue(row);
         }
+
+        return true;
     }
 
     // =========================================================
@@ -39,7 +47,16 @@ public class MapManager : MonoBehaviour
 
             if (distance < _removeDistance) break;
 
-            Destroy(_rows.Dequeue());
+            PlayerController rider = row.GetComponentInChildren<PlayerController>();
+            if (rider != null)
+                rider.RemoveFromPlatform();
+
+            if (!_generator.ReleaseRow(row))
+            {
+                enabled = false;
+                return;
+            }
+            _rows.Dequeue();
         }
     }
 
@@ -51,7 +68,7 @@ public class MapManager : MonoBehaviour
         // 플레이어 앞에 충분한 맵이 없으면 생성
         while (_generator.CurrentZ < _player.position.z + _frontBuffer)
         {
-            AddRows();
+            if (!AddRows()) return;
         }
 
         RemoveOldRows();
@@ -62,6 +79,13 @@ public class MapManager : MonoBehaviour
     // =========================================================
     void Start()
     {
+        if (_generator == null || _player == null)
+        {
+            Debug.LogError("MapManager requires a generator and player.", this);
+            enabled = false;
+            return;
+        }
+
         AddRows();
     }
 

@@ -16,6 +16,7 @@ public class GameManager : MonoBehaviour
 
     int _score = 0;
     int _highScore;
+    float? _furthestZ;
 
     // =========================================================
     // 게임 상태 프로퍼티
@@ -62,12 +63,32 @@ public class GameManager : MonoBehaviour
             UIManager._UM.ChangeScore(_score);
     }
 
+    public void RecordProgress(float startZ, float endZ)
+    {
+        if (!_furthestZ.HasValue)
+            _furthestZ = startZ;
+
+        if (endZ > _furthestZ.Value)
+        {
+            _furthestZ = endZ;
+            AddScore(1);
+        }
+    }
+
+    void ResetScore()
+    {
+        _score = 0;
+        _furthestZ = null;
+        if (UIManager._UM != null)
+            UIManager._UM.ChangeScore(_score);
+    }
+
     // =========================================================
     // 게임 시작
     // =========================================================
     public void StartGame()
     {
-        _score = 0;
+        ResetScore();
 
         ChangeState(GameState.Playing);
     }
@@ -101,7 +122,7 @@ public class GameManager : MonoBehaviour
     // =========================================================
     public void ResetGame()
     {
-        _score = 0;
+        ResetScore();
         ChangeState(GameState.Main);
     }
 

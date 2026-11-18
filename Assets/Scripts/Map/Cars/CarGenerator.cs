@@ -8,6 +8,8 @@ public class CarGenerator : MonoBehaviour
     [SerializeField] Transform[] _spawnPoints;
     [SerializeField] List<GameObject> _cars = new List<GameObject>();
 
+    [SerializeField] int _initialPoolSize = 10;
+
     [Header("Spawn Delay min-max")]
     [SerializeField] float _min = 2f;
     [SerializeField] float _max = 4f;
@@ -53,7 +55,7 @@ public class CarGenerator : MonoBehaviour
 
         while (true)
         {
-            _spawnDelay = Random.Range(2f, _max);
+            _spawnDelay = Random.Range(_min, _max);
             yield return new WaitForSeconds(_spawnDelay);
 
             SpawnCar(angle);
@@ -71,28 +73,66 @@ public class CarGenerator : MonoBehaviour
     }
 
     // =========================================================
-    // Start
+    // OnEnable
     // =========================================================
-    void Start()
+    void OnEnable()
     {
-        // Pooling
-        _carsPools = new GameObjectPool<CarMovement>(12, () =>
+        if (_min <= 0f || _max < _min)
         {
-            var prefab = _cars[Random.Range(0, _cars.Count)];
+            Debug.LogError("Car spawn delays must satisfy 0 < min <= max.", this);
+            enabled = false;
+            return;
+        }
 
-            var obj = Instantiate(prefab, _root);
-            obj.SetActive(false);
+        if (_cars == null || _cars.Count == 0)
+        {
+            Debug.LogError("Car generator requires at least one car prefab.", this);
+            enabled = false;
+            return;
+        }
 
-            var car = obj.GetComponent<CarMovement>();
-            car.InitCar(this);
+        for (int i = 0; i < _cars.Count; i++)
+        {
+            if (_cars[i] == null || _cars[i].GetComponent<CarMovement>() == null)
+            {
+                Debug.LogError($"Car prefab at index {i} is missing or has no CarMovement component.", this);
+                enabled = false;
+                return;
+            }
+        }
 
-            return car;
-        });
+        // Pooling
+        if (_carsPools == null)
+        {
+            _carsPools = new GameObjectPool<CarMovement>(_initialPoolSize, () =>
+            {
+                GameObject prefab = _cars[Random.Range(0, _cars.Count)];
+
+                GameObject instance = Instantiate(prefab, _root);
+                instance.SetActive(false);
+                CarMovement car = instance.GetComponent<CarMovement>();
+                car.InitCar(this);
+
+                return car;
+            });
+        }
 
         _isLeft = Random.Range(0, 2) == 0;
 
         _randomPoint = _isLeft ? _spawnPoints[0] : _spawnPoints[1];
 
         StartCoroutine(CoSpawnCars());
+    }
+
+    void OnDisable()
+    {
+        StopAllCoroutines();
+        if (_carsPools == null) return;
+
+        foreach (CarMovement car in _root.GetComponentsInChildren<CarMovement>(true))
+        {
+            if (car.gameObject.activeSelf)
+                RemoveCar(car);
+        }
     }
 }

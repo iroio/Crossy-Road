@@ -25,17 +25,18 @@ public class UIManager : MonoBehaviour
 
     public static UIManager _UM;
 
-    bool _isLoading = false;
+    bool _mouseMissing;
 
     // =========================================================
     // ¹öÆ°
     // =========================================================
     public void OnClickRetry()
     {
-        if (_isLoading) return;
-
-        _isLoading = true;
-
+        if (ScenesManager.Instance == null)
+        {
+            Debug.LogError("Cannot load the Game scene without a ScenesManager.", this);
+            return;
+        }
         ScenesManager.Instance.LoadScene("Game");
     }
 
@@ -62,8 +63,7 @@ public class UIManager : MonoBehaviour
     // =========================================================
     public void LoadTitle()
     {
-        GameManager._GM.ResetGame();
-        ScenesManager.Instance.LoadScene("Title");
+        OnClickRetry();
     }
 
     // =========================================================
@@ -122,7 +122,17 @@ public class UIManager : MonoBehaviour
     {
         if (!GameManager._GM.IsMain) return;
 
-        if (Mouse.current.leftButton.wasPressedThisFrame)
+        Mouse mouse = Mouse.current;
+        if (mouse == null)
+        {
+            if (!_mouseMissing)
+                Debug.LogWarning("Starting the game requires a mouse.", this);
+            _mouseMissing = true;
+            return;
+        }
+
+        _mouseMissing = false;
+        if (mouse.leftButton.wasPressedThisFrame)
         {
             GameManager._GM.StartGame();
 

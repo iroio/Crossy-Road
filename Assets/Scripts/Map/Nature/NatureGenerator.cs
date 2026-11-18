@@ -59,7 +59,7 @@ public class NatureGenerator : MonoBehaviour
 
         obj.position = new Vector3(x, 0f, row.position.z);
 
-        obj.SetParent(_root);
+        obj.SetParent(row);
     }
 
     // =========================================================
@@ -67,6 +67,12 @@ public class NatureGenerator : MonoBehaviour
     // =========================================================
     public void SpawnNatureIn(Transform row)
     {
+        if (_naturesMin < 0 || _naturesMax < _naturesMin || _naturesMax > 9)
+        {
+            Debug.LogError("Nature spawn counts must satisfy 0 <= min <= max <= 9.", this);
+            return;
+        }
+
         _randomCount = Random.Range(_naturesMin, _naturesMax + 1);
 
         // spawn 가능한 위치 초기화
@@ -122,6 +128,7 @@ public class NatureGenerator : MonoBehaviour
     // =========================================================
     public void Removenature(NaturesReturn natures)
     {
+        natures.transform.SetParent(_root, true);
         natures.ReturnNature();
     }
 

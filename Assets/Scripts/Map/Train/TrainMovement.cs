@@ -5,8 +5,6 @@ public class TrainMovement : MonoBehaviour
     TrainGenerator _trainGenerator;
 
     [SerializeField] float _speed;
-    [SerializeField] float _resetRange = 50f;
-
     Vector3 _startPos;
 
     // =========================================================

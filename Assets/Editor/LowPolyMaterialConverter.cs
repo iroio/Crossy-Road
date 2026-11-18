@@ -31,6 +31,14 @@ public static class UrpMaterialConverter
     [MenuItem("Tools/URP Materials/Auto-Convert Imported Materials")]
     public static void ToggleAutoConvertImportedMaterials()
     {
+        if (!IsAutoConvertEnabled && !EditorUtility.DisplayDialog(
+            "Enable automatic material conversion?",
+            "Imported legacy materials will be changed to URP Lit. Some shader properties and visual effects may not be preserved.",
+            "Enable", "Cancel"))
+        {
+            return;
+        }
+
         EditorPrefs.SetBool(AutoConvertPreferenceKey, !IsAutoConvertEnabled);
     }
 
@@ -41,7 +49,7 @@ public static class UrpMaterialConverter
         return true;
     }
 
-    public static bool IsAutoConvertEnabled => EditorPrefs.GetBool(AutoConvertPreferenceKey, true);
+    public static bool IsAutoConvertEnabled => EditorPrefs.GetBool(AutoConvertPreferenceKey, false);
 
     public static int ConvertImportedMaterials(string[] importedAssetPaths)
     {

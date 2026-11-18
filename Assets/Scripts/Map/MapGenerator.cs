@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using UnityEngine;
-using static Unity.Cinemachine.CinemachineSplineRoll;
 
 public class MapGenerator : MonoBehaviour
 {
@@ -18,6 +17,10 @@ public class MapGenerator : MonoBehaviour
 
     [SerializeField]  List<RowData> _rowDatas;
 
+    readonly Dictionary<GameObject, GameObjectPool<Transform>> _rowPools = new Dictionary<GameObject, GameObjectPool<Transform>>();
+    readonly Dictionary<GameObject, GameObject> _rowPrefabs = new Dictionary<GameObject, GameObject>();
+    Transform _inactiveRowsRoot;
+
     int _currentZ = 2;
 
     bool _isGrass = false;
@@ -26,8 +29,14 @@ public class MapGenerator : MonoBehaviour
     // =========================================================
     // 각 행 가중치 계산
     // =========================================================
-    public RowData GetRandomRow()
+    private RowData GetRandomRow()
     {
+        if (_rowDatas == null || _rowDatas.Count == 0)
+        {
+            Debug.LogError("Map generation requires at least one row configuration.", this);
+            return null;
+        }
+
         // 가중치의 총 합
         int totalWeight = 0; 
 
@@ -37,11 +46,32 @@ public class MapGenerator : MonoBehaviour
         // List 전체 순회
         foreach (var row in _rowDatas)
         {
+            if (row == null)
+            {
+                Debug.LogError("Map generation has a missing row configuration.", this);
+                return null;
+            }
+
+            if (row.weight < 0 || row.minRepeat < 1 || row.maxRepeat < row.minRepeat ||
+                row.maxRepeat == int.MaxValue || row.weight > int.MaxValue - totalWeight ||
+                (row.rowType != RowType.Grass && row.prefab == null) ||
+                (row.rowType == RowType.Grass && (_lightGrassPrefab == null || _darkGrassPrefab == null || _natureGenerator == null)))
+            {
+                Debug.LogError($"Invalid map row configuration: {row.name}.", row);
+                return null;
+            }
+
             // 각 행의 가충치 합
             totalWeight += row.weight;
         }
 
         // 0~가중치 총합 사이의 값중 랜덤으로 숫자 하나 추출
+        if (totalWeight == 0)
+        {
+            Debug.LogError("Map row weights must have a positive total.", this);
+            return null;
+        }
+
         int randomValue = Random.Range(0, totalWeight);
 
         // 다시 전체 List 순회
@@ -111,7 +141,7 @@ public class MapGenerator : MonoBehaviour
             }
 
             // 행 생성
-            GameObject newRow =  Instantiate(prefabToSpawn, new Vector3(0, 0, _currentZ), Quaternion.identity, _root);
+            GameObject newRow = GetRow(prefabToSpawn, _currentZ);
 
             // Grass면 자연물 생성
             if (_isGrass)
@@ -126,5 +156,50 @@ public class MapGenerator : MonoBehaviour
         }
 
         return spawnedRows;
+    }
+
+    GameObject GetRow(GameObject prefab, int z)
+    {
+        if (_inactiveRowsRoot == null)
+        {
+            GameObject root = new GameObject("Inactive Row Pool");
+            root.SetActive(false);
+            root.transform.SetParent(_root, false);
+            _inactiveRowsRoot = root.transform;
+        }
+
+        if (!_rowPools.TryGetValue(prefab, out GameObjectPool<Transform> pool))
+        {
+            pool = new GameObjectPool<Transform>(0, () =>
+            {
+                GameObject instance = Instantiate(prefab, _inactiveRowsRoot);
+                instance.SetActive(false);
+                _rowPrefabs.Add(instance, prefab);
+                return instance.transform;
+            });
+            _rowPools.Add(prefab, pool);
+        }
+
+        Transform row = pool.Get();
+        row.SetParent(_root, false);
+        row.SetPositionAndRotation(new Vector3(0, 0, z), Quaternion.identity);
+        row.gameObject.SetActive(true);
+        return row.gameObject;
+    }
+
+    public bool ReleaseRow(GameObject row)
+    {
+        if (row == null || !_rowPrefabs.TryGetValue(row, out GameObject prefab)) return false;
+        if (!row.activeSelf) return false;
+
+        foreach (NaturesReturn nature in row.GetComponentsInChildren<NaturesReturn>())
+        {
+            _natureGenerator.Removenature(nature);
+        }
+
+        row.SetActive(false);
+        row.transform.SetParent(_inactiveRowsRoot, false);
+        _rowPools[prefab].Set(row.transform);
+        return true;
     }
 }

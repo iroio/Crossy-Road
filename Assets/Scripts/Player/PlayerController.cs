@@ -14,9 +14,6 @@ public class PlayerController : MonoBehaviour
     [SerializeField] float _speed = 1f;
     [SerializeField] float _jumpHeight = 1.2f;
 
-    // 통나무 탑승시 고정 높이
-    [SerializeField] float _rideY = 1f;
-
     // =========================================================
     // 최소 스와이프 거리
     // =========================================================
@@ -54,6 +51,7 @@ public class PlayerController : MonoBehaviour
     // 상태 체크
     // =========================================================
     bool _isMoving = false;
+    bool _mouseMissing;
 
     public bool isLog => transform.parent != _defaultParent;
 
@@ -69,17 +67,37 @@ public class PlayerController : MonoBehaviour
     // =========================================================
     public void SwipeInput()
     {
-        if (Mouse.current.leftButton.wasPressedThisFrame)
+        Mouse mouse = GetMouse();
+        if (mouse == null) return;
+
+        if (mouse.leftButton.wasPressedThisFrame)
         {
-            Vector2 pos = Mouse.current.position.ReadValue();
+            Vector2 pos = mouse.position.ReadValue();
             _startMpos = new Vector3(pos.x, pos.y, 0f);
         }
 
-        if (Mouse.current.leftButton.wasReleasedThisFrame)
+        if (mouse.leftButton.wasReleasedThisFrame)
         {
-            Vector2 pos = Mouse.current.position.ReadValue();
+            Vector2 pos = mouse.position.ReadValue();
             _nextMpos = new Vector3(pos.x, pos.y, 0f);
         }
+    }
+
+    Mouse GetMouse()
+    {
+        Mouse mouse = Mouse.current;
+        if (mouse == null)
+        {
+            if (!_mouseMissing)
+                Debug.LogWarning("Player input requires a mouse.", this);
+            _mouseMissing = true;
+        }
+        else
+        {
+            _mouseMissing = false;
+        }
+
+        return mouse;
     }
 
     // =========================================================
@@ -112,6 +130,7 @@ public class PlayerController : MonoBehaviour
                 if (!IsObstacle(Vector3.forward))
                 {
                     StartCoroutine(CoCharJump(Vector3.forward));
+                    StartCoroutine(CoRotation(0));
                 }
             }
             else
@@ -156,7 +175,7 @@ public class PlayerController : MonoBehaviour
         float time = 0f;
         float duration = 0.2f;
 
-        while (time < duration)
+        while (time < duration && !_gameManager.IsGameOver)
         {
             time += Time.deltaTime;
 
@@ -166,7 +185,8 @@ public class PlayerController : MonoBehaviour
 
             yield return null;
         }
-        transform.rotation = targetRot;
+        if (!_gameManager.IsGameOver)
+            transform.rotation = targetRot;
     }
 
     // =========================================================
@@ -189,7 +209,7 @@ public class PlayerController : MonoBehaviour
         float duration = _moveDistance / _speed;
         float time = 0f;
 
-        while (time < duration)
+        while (time < duration && !_gameManager.IsGameOver)
         {
             float progress = time / duration;
 
@@ -202,13 +222,15 @@ public class PlayerController : MonoBehaviour
             yield return null;
         }
 
+        if (_gameManager.IsGameOver)
+        {
+            _isMoving = false;
+            yield break;
+        }
+
         transform.position = endPos;
 
-        // 앞으로 이동했을 때만
-        if(dir == Vector3.forward)
-        {
-            _gameManager.AddScore(1);
-        }
+        _gameManager.RecordProgress(startPos.z, endPos.z);
 
         // 착지 후 탑승 검사
         CheckRide();
@@ -274,16 +296,27 @@ public class PlayerController : MonoBehaviour
         }
 
         // 레이가 맞을 플렛폼 식별
-        if (_hit.collider.TryGetComponent(out RidePlatform platform))
+        RidePlatform platform = _hit.collider.GetComponentInParent<RidePlatform>();
+        if (platform == null)
         {
-            transform.SetParent(platform.transform);
-
-            Vector3 pos = transform.position;
-            pos.y = _hit.collider.bounds.max.y + _collider.bounds.extents.y;
-            transform.position = pos;
+            Debug.LogError("A collider on LayerRide has no RidePlatform component in its hierarchy.", _hit.collider);
+            _gameManager.GameOver();
+            return false;
         }
 
+        transform.SetParent(platform.transform);
+
+        Vector3 pos = transform.position;
+        pos.y = _hit.collider.bounds.max.y + _collider.bounds.extents.y;
+        transform.position = pos;
+
         return true;
+    }
+
+    public void RemoveFromPlatform()
+    {
+        transform.SetParent(_defaultParent, true);
+        _gameManager.GameOver();
     }
 
     // =========================================================
@@ -336,10 +369,17 @@ public class PlayerController : MonoBehaviour
     {
         if (_gameManager.IsGameOver) return;
 
+        Mouse mouse = GetMouse();
+        if (mouse == null)
+        {
+            ScaleSize(false);
+            return;
+        }
+
         SwipeInput();
 
         // 플레이어 점프 준비 동작
-        if (Mouse.current.leftButton.IsPressed())
+        if (mouse.leftButton.IsPressed())
         {
             ScaleSize(true);
         }
@@ -348,7 +388,7 @@ public class PlayerController : MonoBehaviour
             ScaleSize(false);
         }
 
-        if (Mouse.current.leftButton.wasReleasedThisFrame)
+        if (mouse.leftButton.wasReleasedThisFrame)
         {
             SwipeDir();
         }

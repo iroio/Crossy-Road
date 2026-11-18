@@ -44,6 +44,10 @@ public class LogGenerator : MonoBehaviour
     // =========================================================
     public void RemoveLog(LogMovement log)
     {
+        PlayerController rider = log.GetComponentInChildren<PlayerController>();
+        if (rider != null)
+            rider.RemoveFromPlatform();
+
         log.gameObject.SetActive(false);
         log.transform.rotation = Quaternion.identity;
         _logsPools.Set(log);
@@ -56,7 +60,7 @@ public class LogGenerator : MonoBehaviour
     {
         float angle = _randomPoint == _spawnPoints[0] ? 90f : -90f;
 
-        int startCount = Random.Range(0, 1);
+        int startCount = 1;
 
         for (int i = 0; i < startCount; i++)
         {
@@ -75,25 +79,40 @@ public class LogGenerator : MonoBehaviour
     }
 
     // =========================================================
-    // Start
+    // OnEnable
     // =========================================================
-    void Start()
+    void OnEnable()
     {
-        _logsPools = new GameObjectPool<LogMovement>(5, () =>
+        if (_logsPools == null)
         {
-            var obj = Instantiate(_log, _root);
-            obj.SetActive(false);
+            _logsPools = new GameObjectPool<LogMovement>(5, () =>
+            {
+                var obj = Instantiate(_log, _root);
+                obj.SetActive(false);
 
-            var log = obj.GetComponentInChildren<LogMovement>();
-            log.InitLog(this);
+                var log = obj.GetComponentInChildren<LogMovement>();
+                log.InitLog(this);
 
-            return log;
-        });
+                return log;
+            });
+        }
 
         _isLeft = Random.Range(0, 2) == 0;
 
         _randomPoint = _isLeft ? _spawnPoints[0] : _spawnPoints[1];
 
         StartCoroutine(CoSpawnLog());
+    }
+
+    void OnDisable()
+    {
+        StopAllCoroutines();
+        if (_logsPools == null) return;
+
+        foreach (LogMovement log in _root.GetComponentsInChildren<LogMovement>(true))
+        {
+            if (log.gameObject.activeSelf)
+                RemoveLog(log);
+        }
     }
 }

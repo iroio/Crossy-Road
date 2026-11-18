@@ -35,6 +35,12 @@ public class LotusGenerator : MonoBehaviour
     // =========================================================
     void SpawnLotusGroup()
     {
+        if (_lotusMin < 0 || _lotusMax < _lotusMin || _lotusMax > 9)
+        {
+            Debug.LogError("Lotus spawn counts must satisfy 0 <= min <= max <= 9.", this);
+            return;
+        }
+
         float angle = Random.Range(0, 360f);
         _randomCount = Random.Range(_lotusMin, _lotusMax + 1);
 
@@ -63,27 +69,43 @@ public class LotusGenerator : MonoBehaviour
     // =========================================================
     public void RemoveLotus(LotusMovement lotus)
     {
+        PlayerController rider = lotus.GetComponentInChildren<PlayerController>();
+        if (rider != null)
+            rider.RemoveFromPlatform();
+
         lotus.gameObject.SetActive(false);
         lotus.transform.rotation = Quaternion.identity;
         _lotusPools.Set(lotus);
     }
 
     // =========================================================
-    // Start
+    // OnEnable
     // =========================================================
-    void Start()
+    void OnEnable()
     {
-        _lotusPools = new GameObjectPool<LotusMovement>(3, () =>
+        if (_lotusPools == null)
         {
-            var obj = Instantiate(_lotus, _root);
-            obj.SetActive(false);
+            _lotusPools = new GameObjectPool<LotusMovement>(3, () =>
+            {
+                var obj = Instantiate(_lotus, _root);
+                obj.SetActive(false);
 
-            var lotus = obj.GetComponent<LotusMovement>();
-            lotus.InitLotus(this);
-
-            return lotus;
-        });
+                var lotus = obj.GetComponent<LotusMovement>();
+                return lotus;
+            });
+        }
 
         SpawnLotusGroup();
+    }
+
+    void OnDisable()
+    {
+        if (_lotusPools == null) return;
+
+        foreach (LotusMovement lotus in _root.GetComponentsInChildren<LotusMovement>(true))
+        {
+            if (lotus.gameObject.activeSelf)
+                RemoveLotus(lotus);
+        }
     }
 }

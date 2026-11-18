@@ -559,7 +559,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::MapManager
   _generator: {fileID: 718734846}
   _player: {fileID: 656733898}
-  _startRowCount: 20
   _frontBuffer: 40
   _removeDistance: 20
 --- !u!4 &227710047
