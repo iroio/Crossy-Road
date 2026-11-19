@@ -15,16 +15,15 @@ public class LogGenerator : MonoBehaviour
 
     Transform _randomPoint;
 
+    const string _poolName = "Log";
     GameObjectPool<LogMovement> _logsPools;
 
     float _spawnDelay;
 
-    bool _isLeft;
-
     // =========================================================
     // SpawnLog
     // =========================================================
-    public void SpawnLog(float angle)
+    public void SpawnLog()
     {
         var log = _logsPools.Get();
 
@@ -37,8 +36,6 @@ public class LogGenerator : MonoBehaviour
 
         // 이동 방향 전달
         log.SetDirection(moveRight);
-
-        log.gameObject.SetActive(true);
     }
 
     // =========================================================
@@ -50,7 +47,6 @@ public class LogGenerator : MonoBehaviour
         if (rider != null)
             rider.RemoveFromPlatform();
 
-        log.ResetState();
         _logsPools.Return(log);
     }
 
@@ -59,23 +55,16 @@ public class LogGenerator : MonoBehaviour
     // =========================================================
     IEnumerator CoSpawnLog()
     {
-        float angle = _randomPoint == _spawnPoints[0] ? 90f : -90f;
+        yield return new WaitForSeconds(Random.Range(0.5f, 1.2f));
 
-        int startCount = 1;
-
-        for (int i = 0; i < startCount; i++)
-        {
-            SpawnLog(angle);
-
-            yield return new WaitForSeconds(Random.Range(0.5f, 1.2f));
-        }
+        SpawnLog();
 
         while (true)
         {
             _spawnDelay = Random.Range(_min, _max);
             yield return new WaitForSeconds(_spawnDelay);
 
-            SpawnLog(angle);
+            SpawnLog();
         }
     }
 
@@ -84,16 +73,18 @@ public class LogGenerator : MonoBehaviour
     // =========================================================
     void OnEnable()
     {
-        LogMovement log = _log.GetComponentInChildren<LogMovement>();
         if (_logsPools == null)
         {
-            _logsPools = new GameObjectPool<LogMovement>(
-                log, _root, _initialSize, log => log.InitLog(this));
+            _logsPools = new GameObjectPool<LogMovement>(_root, _initialSize,
+                () => Instantiate(_log, _root).GetComponentInChildren<LogMovement>(),
+                log => log.InitLog(this));
         }
 
-        _isLeft = Random.Range(0, 2) == 0;
+        ObjectPoolManager.Instance.RegisterPool(_poolName, _logsPools);
 
-        _randomPoint = _isLeft ? _spawnPoints[0] : _spawnPoints[1];
+        _randomPoint = Random.Range(0, 2) == 0
+            ? _spawnPoints[0]
+            : _spawnPoints[1];
 
         StartCoroutine(CoSpawnLog());
     }

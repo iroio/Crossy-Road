@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class CarMovement : MonoBehaviour
+public class CarMovement : MonoBehaviour, IPoolable
 {
     CarGenerator _carGenerator;
 
@@ -48,17 +48,8 @@ public class CarMovement : MonoBehaviour
     }
 
     // =========================================================
-    // 정면 충돌 확인
+    // CheckFront
     // =========================================================
-
-    // =========================================================
-    // 상태 리셋
-    // =========================================================
-    public void ResetState()
-    {
-        _targetSpeed = 0f;
-        _isFrontCarDetected = false;
-    }
     public void CheckFront()
     {
         _origin = new Vector3(transform.position.x, 0.5f, transform.position.z);
@@ -82,11 +73,26 @@ public class CarMovement : MonoBehaviour
             _targetSpeed = _speed;
         }
     }
-    
-// =========================================================
-//  Start
-// =========================================================
-void Start()
+
+    // =========================================================
+    // Ipoolable 구현
+    // =========================================================
+    public void OnCreate() { }
+    public void OnGet()
+    {
+        ResetState();
+    }
+    public void OnReturn() { }
+    public void ResetState()
+    {
+        _targetSpeed = 0f;
+        _isFrontCarDetected = false;
+    }
+
+    // =========================================================
+    //  Start
+    // =========================================================
+    void Start()
     {
         _speed = Random.Range(_min, _max);
         _targetSpeed = _speed * 0.9f;

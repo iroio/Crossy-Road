@@ -9,7 +9,8 @@ public class RiverController : MonoBehaviour
 
     GameManager _gameManager;
 
-    GameObjectPool<ParticleSystem> _splashPool;
+    const string _poolName = "Splash";
+    GameObjectPool<SpalshPool> _splashPool;
 
     // =========================================================
     // Sink the character
@@ -53,19 +54,19 @@ public class RiverController : MonoBehaviour
     {
         if (_splashPool == null) return;
 
-        ParticleSystem splash = _splashPool.Get();
+        SpalshPool splash = _splashPool.Get();
         if (splash == null) return;
 
         splash.transform.position = position;
-        splash.Play();
-        
+        splash.OnGet();
+
         StartCoroutine(ReturnSplashAfterDelay(splash, 2f));
     }
 
     // =========================================================
     // 일정 시간 후 Splash 반환
     // =========================================================
-    IEnumerator ReturnSplashAfterDelay(ParticleSystem splash, float delay)
+    IEnumerator ReturnSplashAfterDelay(SpalshPool splash, float delay)
     {
         yield return new WaitForSeconds(delay);
         
@@ -77,9 +78,29 @@ public class RiverController : MonoBehaviour
 
     private void OnEnable()
     {
-        ParticleSystem splash = _splashPrefab.GetComponentInChildren<ParticleSystem>();
-        _splashPool = new GameObjectPool<ParticleSystem>(
-            splash, transform, _initialSize, splash => splash.Play());
+        if (_splashPrefab == null)
+        {
+            Debug.LogError("Splash Prefab이 할당되지 않았습니다.", this);
+            enabled = false;
+            return;
+        }
+
+        SpalshPool splash = _splashPrefab.GetComponentInChildren<SpalshPool>();
+
+        if (splash == null)
+        {
+            Debug.LogError($"SpalshPool 컴포넌트를 찾을 수 없습니다: " +
+                $"{_splashPrefab.name}", _splashPrefab);
+
+            enabled = false;
+            return;
+        }
+
+        _splashPool = new GameObjectPool<SpalshPool>(transform, _initialSize, 
+            ()=> Instantiate(splash, transform),
+            splash => splash.OnGet());
+
+        ObjectPoolManager.Instance.RegisterPool(_poolName, _splashPool);
     }
 
     // =========================================================

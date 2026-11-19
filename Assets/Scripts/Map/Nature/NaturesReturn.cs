@@ -1,19 +1,22 @@
 using UnityEngine;
 
-public class NaturesReturn : MonoBehaviour
+public class NaturesReturn : MonoBehaviour, IPoolable
 {
-    GameObjectPool<Transform> _pool;
+    private GameObjectPool<NaturesReturn> _pool;
 
-    public void SetPool(GameObjectPool<Transform> pool)
+    public void SetPool(GameObjectPool<NaturesReturn> pool)
     {
         _pool = pool;
     }
 
-    public void ReturnNature()
+    // =========================================================
+    // Ipoolable ±¸Çö
+    // =========================================================
+    public void OnCreate() { }
+    public void OnGet() { }
+    public void OnReturn() 
     {
         gameObject.SetActive(false);
         transform.rotation = Quaternion.identity;
-
-        _pool.Return(transform);
     }
 }

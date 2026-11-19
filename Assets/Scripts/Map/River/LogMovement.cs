@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class LogMovement : RidePlatform
+public class LogMovement : RidePlatform, IPoolable
 {
     LogGenerator _logGenerator;
     
@@ -27,15 +27,25 @@ public class LogMovement : RidePlatform
     }
 
     // =========================================================
-    // ResetState
+    // SetDirection
     // =========================================================
-    public void ResetState()
-    {
-        _moveRight = false;
-    }
     public void SetDirection(bool moveRight)
     {
         _moveRight = moveRight;
+    }
+
+    // =========================================================
+    // Ipoolable ±¸Çö
+    // =========================================================
+    public void OnCreate() { }
+    public void OnGet()
+    {
+        ResetState();
+    }
+    public void OnReturn() { }
+    public void ResetState()
+    {
+        _moveRight = false;
     }
 
     // =========================================================

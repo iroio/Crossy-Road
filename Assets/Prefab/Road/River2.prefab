@@ -4991,6 +4991,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 9108711684061035379}
+  - component: {fileID: -8304287863375937583}
   m_Layer: 8
   m_Name: River2
   m_TagString: Untagged
@@ -5014,6 +5015,18 @@ Transform:
   - {fileID: 4116665429559449780}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &-8304287863375937583
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3969358149219813902}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e59ec68b7b88973439caa177aef31ba8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RowObject
 --- !u!1 &4516240647895341001
 GameObject:
   m_ObjectHideFlags: 0
@@ -10009,6 +10022,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RiverController
   _splashPrefab: {fileID: 3426444474379522449, guid: 15e2cf24b60a9c5499c28b26a8e421f7, type: 3}
+  _initialSize: 5
 --- !u!1 &8555651437044102429
 GameObject:
   m_ObjectHideFlags: 0
@@ -10063,6 +10077,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::LotusGenerator
   _root: {fileID: 5518006457024689987}
   _lotus: {fileID: 2090306605897589277, guid: 21e5aebb947fff44bb14ec4658348534, type: 3}
+  _initialSize: 10
   _lotusMin: 2
   _lotusMax: 4
 --- !u!1 &8628563133751975635

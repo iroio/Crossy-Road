@@ -243,6 +243,7 @@ MonoBehaviour:
   - {fileID: 3307702513037894837, guid: 03198fb278a41a14092626247340d8f1, type: 3}
   - {fileID: 6846844699203062169, guid: dbcda3766e49daf42bc46552297d0fde, type: 3}
   - {fileID: 3147137350561510952, guid: c80409d9701d3024bb7345031ee3c5ea, type: 3}
+  _initialSize: 10
   _min: 1
   _max: 3
 --- !u!1 &4804982278640819652
@@ -347,6 +348,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4783181960870425348}
+  - component: {fileID: 1415274251157955140}
   m_Layer: 7
   m_Name: Asphalt
   m_TagString: Untagged
@@ -370,6 +372,18 @@ Transform:
   - {fileID: 5885161980221827738}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1415274251157955140
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8434388503780023459}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e59ec68b7b88973439caa177aef31ba8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RowObject
 --- !u!1 &9128339762083759304
 GameObject:
   m_ObjectHideFlags: 0

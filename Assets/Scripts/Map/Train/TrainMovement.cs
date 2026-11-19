@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class TrainMovement : MonoBehaviour
+public class TrainMovement : MonoBehaviour, IPoolable
 {
     TrainGenerator _trainGenerator;
 
@@ -13,6 +13,20 @@ public class TrainMovement : MonoBehaviour
     public void InitTrain(TrainGenerator train)
     {
         _trainGenerator = train;
+    }
+
+    // =========================================================
+    // Ipoolable ±¸Çö
+    // =========================================================
+    public void OnCreate() { }
+    public void OnGet()
+    {
+        ResetState();
+    }
+    public void OnReturn() { }
+    public void ResetState() 
+    {
+        _startPos = Vector3.zero;
     }
 
     // =========================================================

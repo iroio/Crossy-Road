@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 5666102871306700604}
   - component: {fileID: 5741419820450820053}
   - component: {fileID: 1653676547367327883}
+  - component: {fileID: 1858565894759431809}
   m_Layer: 0
   m_Name: Splash
   m_TagString: Untagged
@@ -4894,3 +4895,15 @@ ParticleSystemRenderer:
   m_MeshWeighting1: 1
   m_MeshWeighting2: 1
   m_MeshWeighting3: 1
+--- !u!114 &1858565894759431809
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3426444474379522449}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 20955a2ac1f10d24d9dc6cb0fe3bb605, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SpalshPool

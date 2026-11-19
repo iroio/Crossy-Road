@@ -783,7 +783,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 821a4ab3394a50248931b93e01bf8570, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MouseManager
-  _click: {fileID: 2059966796125951926, guid: 052faaac586de48259a63d0c4782560b, type: 3}
 --- !u!4 &267562958
 Transform:
   m_ObjectHideFlags: 0
@@ -1661,6 +1660,7 @@ MonoBehaviour:
   - {fileID: 3624140507472243922, guid: a7e44f2b1de474d4da2e4c316f59a474, type: 3}
   - {fileID: 2492461111311640132, guid: d272bf05d29a72542b5a3f00cd5fb93a, type: 3}
   _root: {fileID: 1169128835}
+  _initialSize: 10
   _naturesMin: 1
   _naturesMax: 2
 --- !u!4 &654849315
@@ -1715,6 +1715,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::MapGenerator
   _natureGenerator: {fileID: 654849314}
   _root: {fileID: 1424070430}
+  _initialSize: 10
   _lightGrassPrefab: {fileID: 6605098234722757372, guid: 671cb6f2ec9a8ab4282e0c43e9a96251, type: 3}
   _darkGrassPrefab: {fileID: 7474120384023877749, guid: e4f9f92fd9dcf2f4286079e529e03a53, type: 3}
   _rowDatas:
@@ -2607,6 +2608,50 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0.3664921, y: -0.1452996, z: 0.058060285, w: 0.9171699}
   m_LocalPosition: {x: 6.5, y: 30, z: -20}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1316612601
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1316612603}
+  - component: {fileID: 1316612602}
+  m_Layer: 0
+  m_Name: ObjectPoolManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1316612602
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1316612601}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6d93cf3b17aebc944b287608d62d2f08, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ObjectPoolManager
+--- !u!4 &1316612603
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1316612601}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -4431,6 +4476,7 @@ SceneRoots:
   - {fileID: 772240969}
   - {fileID: 227710047}
   - {fileID: 267562958}
+  - {fileID: 1316612603}
   - {fileID: 1784037166}
   - {fileID: 654849315}
   - {fileID: 718734847}

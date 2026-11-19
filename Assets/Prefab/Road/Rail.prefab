@@ -279,9 +279,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TrainGenerator
   _train: {fileID: 961943194646290550, guid: 5bf7743d60fb6324c87346f4367dc0d6, type: 3}
+  _root: {fileID: 0}
   _spawnPoints:
   - {fileID: 4378730841592390195}
   - {fileID: 7400981479170007534}
+  _initialSize: 1
 --- !u!1 &817779784928100717
 GameObject:
   m_ObjectHideFlags: 0
@@ -2465,6 +2467,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 735145348563701355}
+  - component: {fileID: 7598320648075902445}
   m_Layer: 9
   m_Name: Rail
   m_TagString: Untagged
@@ -2489,6 +2492,18 @@ Transform:
   - {fileID: 3105792199096008550}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &7598320648075902445
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4041822275359063847}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e59ec68b7b88973439caa177aef31ba8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RowObject
 --- !u!1 &4071087311148659266
 GameObject:
   m_ObjectHideFlags: 0

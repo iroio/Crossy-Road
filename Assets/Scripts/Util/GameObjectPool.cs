@@ -2,10 +2,10 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class GameObjectPool<T> where T : Component
+public class GameObjectPool<T> where T : Component, IPoolable
 {
-    readonly T _prefab;
     readonly Transform _poolRoot;
+    readonly Func<T> _createFunction;
     readonly Action<T> _onCreate;
 
     readonly Queue<T> _pool = new Queue<T>();
@@ -14,13 +14,14 @@ public class GameObjectPool<T> where T : Component
     public int Available => _pool.Count;
     public int ActiveCount => _activeObjects.Count;
 
-    public GameObjectPool(T prefab, Transform poolRoot, int initialSize, Action<T> onCreate = null)
+    public GameObjectPool(Transform poolRoot, int initialSize, 
+        Func<T> createFunction, Action<T> onCreate = null)
     {
-        _prefab = prefab
-            ?? throw new ArgumentNullException(nameof(prefab));
-
         _poolRoot = poolRoot
             ?? throw new ArgumentNullException(nameof(poolRoot));
+
+        _createFunction = createFunction
+            ?? throw new ArgumentNullException(nameof(createFunction));
 
         _onCreate = onCreate;
 
@@ -31,35 +32,33 @@ public class GameObjectPool<T> where T : Component
     {
         for (int i = 0; i < size; i++)
         {
-            CreateObject();
+            _pool.Enqueue(CreateObject());
         }
     }
 
     private T CreateObject()
     {
-        T obj = UnityEngine.Object.Instantiate(_prefab, _poolRoot);
-        _onCreate?.Invoke(obj);
+        T obj = _createFunction();
+
+        if(obj == null)
+            throw new InvalidOperationException
+                ("Create function returned null.");
+        
+        obj.OnCreate();
         obj.gameObject.SetActive(false);
 
-        _pool.Enqueue(obj);
         return obj;
     }
 
     public T Get()
     {
-        T obj;
-        
-        if (_pool.Count > 0)
-        {
-            obj = _pool.Dequeue();
-        }
-        else
-        {
-            obj = CreateObject();
-        }
+        T obj = _pool.Count > 0 ? 
+            _pool.Dequeue() : CreateObject();
 
         _activeObjects.Add(obj);
+        obj.OnGet();
         obj.gameObject.SetActive(true);
+
         return obj;
     }
 
@@ -68,9 +67,9 @@ public class GameObjectPool<T> where T : Component
         if (obj == null || !_activeObjects.Remove(obj))
             return;
 
+        obj.OnReturn();
         obj.gameObject.SetActive(false);
         obj.transform.SetParent(_poolRoot);
-        obj.transform.rotation = Quaternion.identity;
 
         _pool.Enqueue(obj);
     }

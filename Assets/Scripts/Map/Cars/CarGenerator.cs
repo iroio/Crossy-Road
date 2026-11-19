@@ -16,11 +16,10 @@ public class CarGenerator : MonoBehaviour
 
     Transform _randomPoint;
 
+    const string _poolName = "Car";
     GameObjectPool<CarMovement> _carsPools;
 
     float _spawnDelay;
-
-    bool _isLeft;
 
     // =========================================================
     // SpawnCar
@@ -33,8 +32,6 @@ public class CarGenerator : MonoBehaviour
 
         car.transform.position = _randomPoint.position;
         car.transform.rotation = Quaternion.Euler(0f, angle, 0f);
-
-        car.gameObject.SetActive(true);
     }
 
     // =========================================================
@@ -67,7 +64,6 @@ public class CarGenerator : MonoBehaviour
     // =========================================================
     public void RemoveCar(CarMovement car)
     {
-        car.ResetState();
         _carsPools.Return(car);
     }
 
@@ -101,12 +97,14 @@ public class CarGenerator : MonoBehaviour
         }
 
         // Pooling
-        CarMovement car = _cars[Random.Range(0, _cars.Count)].GetComponent<CarMovement>();
         if (_carsPools == null)
         {
-            _carsPools = new GameObjectPool<CarMovement>(
-                car, _root, _initialSize, car => car.InitCar(this));
+            _carsPools = new GameObjectPool<CarMovement>(_root, _initialSize, 
+                ()=> Instantiate(_cars[Random.Range(0, _cars.Count)], _root).GetComponent<CarMovement>(),
+                car => car.InitCar(this));
         }
+
+        ObjectPoolManager.Instance.RegisterPool(_poolName, _carsPools);
 
         _randomPoint = Random.Range(0, 2) == 0
             ? _spawnPoints[0] : _spawnPoints[1];

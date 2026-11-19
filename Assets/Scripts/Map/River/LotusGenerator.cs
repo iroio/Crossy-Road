@@ -14,6 +14,7 @@ public class LotusGenerator : MonoBehaviour
 
     int _randomCount;
 
+    const string _poolName = "Lotus";
     GameObjectPool<LotusMovement> _lotusPools;
     List<int> _lotusPos = new List<int>();
 
@@ -75,8 +76,6 @@ public class LotusGenerator : MonoBehaviour
         if (rider != null)
             rider.RemoveFromPlatform();
 
-        lotus.gameObject.SetActive(false);
-        lotus.transform.rotation = Quaternion.identity;
         _lotusPools.Return(lotus);
     }
 
@@ -87,10 +86,15 @@ public class LotusGenerator : MonoBehaviour
     {
         if (_lotusPools == null)
         {
-            _lotusPools = new GameObjectPool<LotusMovement>(
-                _lotus.GetComponentInChildren<LotusMovement>(), 
-                _root, _initialSize, lotus => lotus.InitLotus(this));
+            _lotusPools = new GameObjectPool<LotusMovement>(_root, _initialSize, 
+                ()=> 
+                {
+                    return Instantiate(_lotus, _root).GetComponent<LotusMovement>();
+                },
+                lotus => lotus.InitLotus(this));
         }
+
+        ObjectPoolManager.Instance.RegisterPool(_poolName, _lotusPools);
 
         SpawnLotusGroup();
     }

@@ -15,6 +15,7 @@ public class TrainGenerator : MonoBehaviour
 
     public Transform CurrentTrain => _currentTrain;
 
+    const string _poolName = "Train";
     GameObjectPool<TrainMovement> _trainPool;
 
     // =========================================================
@@ -68,10 +69,16 @@ public class TrainGenerator : MonoBehaviour
             TrainMovement train = _train.GetComponent<TrainMovement>();
             if (train != null)
             {
-                _trainPool = new GameObjectPool<TrainMovement>(
-                    train, _root, _initialSize, train => train.InitTrain(this));
+                _trainPool = new GameObjectPool<TrainMovement>(_root, _initialSize, 
+                () =>
+                {
+                    return Instantiate(train, _root);
+                },
+                train => train.InitTrain(this));
             }
         }
+
+        ObjectPoolManager.Instance.RegisterPool(_poolName, _trainPool);
 
         _isLeft = Random.Range(0, 2) == 0;
         _randomPoint = _isLeft ? _spawnPoints[0] : _spawnPoints[1];

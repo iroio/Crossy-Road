@@ -14,13 +14,14 @@ public class NatureGenerator : MonoBehaviour
 
     int _randomCount;
 
-    GameObjectPool<Transform>[] _naturesPools;
+    GameObjectPool<NaturesReturn>[] _naturesPools;
+
     List<int> _naturePos = new List<int>();
 
     // =========================================================
     // Pool º±≈√
     // =========================================================
-    private GameObjectPool<Transform> GetNaturePool()
+    private GameObjectPool<NaturesReturn> GetNaturePool()
     {
         int random = Random.Range(0, _naturesPools.Length);
 
@@ -32,9 +33,9 @@ public class NatureGenerator : MonoBehaviour
     // =========================================================
     public Transform GetNature()
     {
-        GameObjectPool<Transform> pool = GetNaturePool();
+        GameObjectPool<NaturesReturn> pool = GetNaturePool();
 
-        Transform obj = pool.Get();
+        NaturesReturn obj = pool.Get();
 
         if (obj == null) return null;
 
@@ -45,9 +46,7 @@ public class NatureGenerator : MonoBehaviour
             natures.SetPool(pool);
         }
 
-        obj.gameObject.SetActive(true);
-
-        return obj;
+        return obj.transform;
     }
 
     // =========================================================
@@ -131,7 +130,7 @@ public class NatureGenerator : MonoBehaviour
     public void Removenature(NaturesReturn natures)
     {
         natures.transform.SetParent(_root, true);
-        natures.ReturnNature();
+        natures.OnReturn();
     }
 
     // =========================================================
@@ -139,15 +138,19 @@ public class NatureGenerator : MonoBehaviour
     // =========================================================
     void Awake()
     {
-        _naturesPools = new GameObjectPool<Transform>[_natures.Length];
+        _naturesPools = new GameObjectPool<NaturesReturn>[_natures.Length];
 
         int length = _natures.Length;
         for (int i = 0; i < length; i++)
         {
             GameObject prefab = _natures[i];
 
-            _naturesPools[i] = new GameObjectPool<Transform>(
-                prefab.transform, _root, _initialSize);
+            _naturesPools[i] = new GameObjectPool<NaturesReturn>(_root, _initialSize,
+                ()=> Instantiate(prefab, _root).GetComponent<NaturesReturn>());
+
+            // fix with AI
+            // fix: Register each nature pool to ObjectPoolManager
+            ObjectPoolManager.Instance.RegisterPool($"Nature{i}", _naturesPools[i]);
         }
     }
 }

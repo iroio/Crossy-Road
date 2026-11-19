@@ -19,13 +19,20 @@ public class MapGenerator : MonoBehaviour
 
     [SerializeField]  List<RowData> _rowDatas;
 
-    readonly Dictionary<GameObject, GameObjectPool<Transform>> _rowPools = new Dictionary<GameObject, GameObjectPool<Transform>>();
-    readonly Dictionary<GameObject, GameObject> _rowPrefabs = new Dictionary<GameObject, GameObject>();
+    const string _poolName = "Row";
+    readonly Dictionary<GameObject, GameObjectPool<RowObject>> _rowPools 
+        = new Dictionary<GameObject, GameObjectPool<RowObject>>();
+    
+    //fix: Track registered pools to avoid duplicate registration
+    readonly Dictionary<GameObject, bool> _registeredPools = new Dictionary<GameObject, bool>();
+
+    readonly Dictionary<GameObject, GameObject> _rowPrefabs 
+        = new Dictionary<GameObject, GameObject>();
+
     Transform _inactiveRowsRoot;
 
     int _currentZ = 2;
 
-    bool _isGrass = false;
     public int CurrentZ => _currentZ;
 
     // =========================================================
@@ -124,29 +131,28 @@ public class MapGenerator : MonoBehaviour
             // 실제 생성할 프리팹을 저장할 변수
             GameObject prefabToSpawn;
 
+            bool isGrass = row.rowType == RowType.Grass;
+
             // 선택된 행이 Grass 이면
-            if (row.rowType == RowType.Grass)
+            if (isGrass)
             {
                 // 짝수 행에 어두운 타일 배치
                 // 홀수 행에 밝은 타일 배치
                 int rowIndex = _currentZ / 2;
 
                 prefabToSpawn = (rowIndex % 2 == 0) ? _darkGrassPrefab : _lightGrassPrefab;
-
-                _isGrass = true;
             }
             else
             {
                 // 아니면 별도의 과정 없이 행 선택
                 prefabToSpawn = row.prefab;
-                _isGrass = false;
             }
 
             // 행 생성
             GameObject newRow = GetRow(prefabToSpawn, _currentZ);
 
             // Grass면 자연물 생성
-            if (_isGrass)
+            if (isGrass)
             {
                 _natureGenerator.SpawnNatureGroup(newRow.transform);
             }
@@ -170,18 +176,30 @@ public class MapGenerator : MonoBehaviour
             _inactiveRowsRoot = root.transform;
         }
 
-        if (!_rowPools.TryGetValue(prefab, out GameObjectPool<Transform> pool))
+        if (!_rowPools.TryGetValue(prefab, out GameObjectPool<RowObject> pool))
         {
-            pool = new GameObjectPool<Transform>(
-                prefab.transform, _inactiveRowsRoot, _initialSize);
+            pool = new GameObjectPool<RowObject>(_inactiveRowsRoot, _initialSize,
+                ()=> Instantiate(prefab, _inactiveRowsRoot).GetComponent<RowObject>());
 
             _rowPools.Add(prefab, pool);
+
+            // fix with AI
+            // fix: Register row pool to ObjectPoolManager on first pool creation
+            if (!_registeredPools.ContainsKey(prefab))
+            {
+                string poolKey = $"Row{prefab.name}";
+                ObjectPoolManager.Instance.RegisterPool(poolKey, pool);
+                _registeredPools[prefab] = true;
+            }
         }
 
-        Transform row = pool.Get();
-        row.SetParent(_root, false);
-        row.SetPositionAndRotation(new Vector3(0, 0, z), Quaternion.identity);
-        row.gameObject.SetActive(true);
+        RowObject row = pool.Get();
+
+        _rowPrefabs[row.gameObject] = prefab;
+
+        row.transform.SetParent(_root, false);
+        row.transform.SetPositionAndRotation(new Vector3(0, 0, z), Quaternion.identity);
+
         return row.gameObject;
     }
 
@@ -195,9 +213,11 @@ public class MapGenerator : MonoBehaviour
             _natureGenerator.Removenature(nature);
         }
 
-        row.SetActive(false);
+        _rowPrefabs.Remove(row);
+
         row.transform.SetParent(_inactiveRowsRoot, false);
-        _rowPools[prefab].Return(row.transform);
+        _rowPools[prefab].Return(row.GetComponent<RowObject>());
+
         return true;
     }
 }
