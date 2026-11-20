@@ -45,6 +45,7 @@ public class GameObjectPool<T> where T : Component, IPoolable
                 ("Create function returned null.");
         
         obj.OnCreate();
+        _onCreate?.Invoke(obj);
         obj.gameObject.SetActive(false);
 
         return obj;

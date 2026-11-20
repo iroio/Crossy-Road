@@ -96,9 +96,8 @@ public class RiverController : MonoBehaviour
             return;
         }
 
-        _splashPool = new GameObjectPool<SpalshPool>(transform, _initialSize, 
-            ()=> Instantiate(splash, transform),
-            splash => splash.OnGet());
+        _splashPool = new GameObjectPool<SpalshPool>(transform, _initialSize,
+            () => Instantiate(splash, transform));
 
         ObjectPoolManager.Instance.RegisterPool(_poolName, _splashPool);
     }
