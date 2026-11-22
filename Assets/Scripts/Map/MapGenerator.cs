@@ -184,7 +184,7 @@ public class MapGenerator : MonoBehaviour
             _rowPools.Add(prefab, pool);
 
             // fix with AI
-            // fix: Register row pool to ObjectPoolManager on first pool creation
+            // fix: Register row pool to Ob/ectPoolManager on first pool creation
             if (!_registeredPools.ContainsKey(prefab))
             {
                 string poolKey = $"Row{prefab.name}";

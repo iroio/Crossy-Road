@@ -102,9 +102,9 @@ public class CarGenerator : MonoBehaviour
             _carsPools = new GameObjectPool<CarMovement>(_root, _initialSize, 
                 ()=> Instantiate(_cars[Random.Range(0, _cars.Count)], _root).GetComponent<CarMovement>(),
                 car => car.InitCar(this));
-        }
 
-        ObjectPoolManager.Instance.RegisterPool(_poolName, _carsPools);
+            ObjectPoolManager.Instance.RegisterPool(_poolName, _carsPools);
+        }
 
         _randomPoint = Random.Range(0, 2) == 0
             ? _spawnPoints[0] : _spawnPoints[1];
