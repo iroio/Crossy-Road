@@ -3,6 +3,8 @@ using UnityEngine;
 
 public class LogGenerator : MonoBehaviour
 {
+    ObjectPoolManager _poolManager;
+
     [SerializeField] Transform _root;
     [SerializeField] Transform[] _spawnPoints;
     [SerializeField] GameObject _log;
@@ -25,7 +27,7 @@ public class LogGenerator : MonoBehaviour
     // =========================================================
     public void SpawnLog()
     {
-        var log = _logsPools.Get();
+        LogMovement log = _logsPools.Get();
 
         if (log == null) return;
 
@@ -73,14 +75,17 @@ public class LogGenerator : MonoBehaviour
     // =========================================================
     void OnEnable()
     {
+        _poolManager = ObjectPoolManager.Instance;
         if (_logsPools == null)
         {
-            _logsPools = new GameObjectPool<LogMovement>(_root, _initialSize,
+            var pool = new GameObjectPool<LogMovement>(_root, _initialSize,
                 () => Instantiate(_log, _root).GetComponentInChildren<LogMovement>(),
                 log => log.InitLog(this));
+
+            _poolManager.RegisterPool(this, _poolName, pool);
         }
 
-        ObjectPoolManager.Instance.RegisterPool(_poolName, _logsPools);
+        _logsPools = _poolManager.GetPool<LogMovement>(this, _poolName);
 
         _randomPoint = Random.Range(0, 2) == 0
             ? _spawnPoints[0]
@@ -99,6 +104,12 @@ public class LogGenerator : MonoBehaviour
             if (log.gameObject.activeSelf)
                 RemoveLog(log);
         }
+    }
+
+    private void OnDestroy()
+    {
+        if (_poolManager != null)
+            _poolManager.UnregisterPools(this);
     }
 }
 

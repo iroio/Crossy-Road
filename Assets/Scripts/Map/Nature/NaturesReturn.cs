@@ -9,6 +9,17 @@ public class NaturesReturn : MonoBehaviour, IPoolable
         _pool = pool;
     }
 
+    public void ReturnToPool()
+    {
+        if (_pool == null)
+        {
+            Debug.LogError("Nature object has no registered pool.", this);
+            return;
+        }
+
+        _pool.Return(this);
+    }
+
     // =========================================================
     // Ipoolable ±¸Çö
     // =========================================================

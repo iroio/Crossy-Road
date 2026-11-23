@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class CarGenerator : MonoBehaviour
 {
+    ObjectPoolManager _poolManager;
+
     [SerializeField] Transform _root;
     [SerializeField] Transform[] _spawnPoints;
     [SerializeField] List<GameObject> _cars = new List<GameObject>();
@@ -26,7 +28,7 @@ public class CarGenerator : MonoBehaviour
     // =========================================================
     public void SpawnCar(float angle)
     {
-        var car = _carsPools.Get();
+        CarMovement car = _carsPools.Get();
 
         if (car == null) return;
 
@@ -96,15 +98,16 @@ public class CarGenerator : MonoBehaviour
             }
         }
 
-        // Pooling
+        _poolManager = ObjectPoolManager.Instance;
         if (_carsPools == null)
         {
-            _carsPools = new GameObjectPool<CarMovement>(_root, _initialSize, 
+            var pool = new GameObjectPool<CarMovement>(_root, _initialSize,
                 ()=> Instantiate(_cars[Random.Range(0, _cars.Count)], _root).GetComponent<CarMovement>(),
                 car => car.InitCar(this));
 
-            ObjectPoolManager.Instance.RegisterPool(_poolName, _carsPools);
+            _poolManager.RegisterPool(this, _poolName, pool);
         }
+        _carsPools = _poolManager.GetPool<CarMovement>(this, _poolName);
 
         _randomPoint = Random.Range(0, 2) == 0
             ? _spawnPoints[0] : _spawnPoints[1];
@@ -122,5 +125,11 @@ public class CarGenerator : MonoBehaviour
             if (car.gameObject.activeSelf)
                 RemoveCar(car);
         }
+    }
+
+    void OnDestroy()
+    {
+        if (_poolManager != null)
+            _poolManager.UnregisterPools(this);
     }
 }

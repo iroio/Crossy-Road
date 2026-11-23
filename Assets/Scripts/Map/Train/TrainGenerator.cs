@@ -2,6 +2,8 @@ using UnityEngine;
 
 public class TrainGenerator : MonoBehaviour
 {
+    ObjectPoolManager _poolManager;
+
     [SerializeField] Transform _train;
     [SerializeField] Transform _root;
     [SerializeField] Transform[] _spawnPoints;
@@ -64,21 +66,35 @@ public class TrainGenerator : MonoBehaviour
     // =========================================================
     void OnEnable()
     {
-        if (_trainPool == null && _train != null)
+        if (_train == null || _root == null)
+        {
+            Debug.LogError("Train generator requires a train prefab and pool root.", this);
+            enabled = false;
+            return;
+        }
+
+        _poolManager = ObjectPoolManager.Instance;
+        if (_trainPool == null)
         {
             TrainMovement train = _train.GetComponent<TrainMovement>();
-            if (train != null)
+            if (train == null)
             {
-                _trainPool = new GameObjectPool<TrainMovement>(_root, _initialSize, 
+                Debug.LogError("Train prefab requires a TrainMovement component.", this);
+                enabled = false;
+                return;
+            }
+
+            var pool = new GameObjectPool<TrainMovement>(_root, _initialSize,
                 () =>
                 {
                     return Instantiate(train, _root);
                 },
                 train => train.InitTrain(this));
-            }
+
+            _poolManager.RegisterPool(this, _poolName, pool);
         }
 
-        ObjectPoolManager.Instance.RegisterPool(_poolName, _trainPool);
+        _trainPool = _poolManager.GetPool<TrainMovement>(this, _poolName);
 
         _isLeft = Random.Range(0, 2) == 0;
         _randomPoint = _isLeft ? _spawnPoints[0] : _spawnPoints[1];
@@ -90,6 +106,8 @@ public class TrainGenerator : MonoBehaviour
     void OnDestroy()
     {
         RemoveTrain();
+        if (_poolManager != null)
+            _poolManager.UnregisterPools(this);
     }
 
     void OnDisable()

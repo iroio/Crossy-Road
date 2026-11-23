@@ -11,6 +11,7 @@ public class RiverController : MonoBehaviour
 
     const string _poolName = "Splash";
     GameObjectPool<SpalshPool> _splashPool;
+    ObjectPoolManager _poolManager;
 
     // =========================================================
     // Sink the character
@@ -96,10 +97,33 @@ public class RiverController : MonoBehaviour
             return;
         }
 
-        _splashPool = new GameObjectPool<SpalshPool>(transform, _initialSize,
-            () => Instantiate(splash, transform));
+        _poolManager = ObjectPoolManager.Instance;
+        if (_splashPool == null)
+        {
+            var pool = new GameObjectPool<SpalshPool>(transform, _initialSize,
+                () => Instantiate(splash, transform));
+            _poolManager.RegisterPool(this, _poolName, pool);
+        }
 
-        ObjectPoolManager.Instance.RegisterPool(_poolName, _splashPool);
+        _splashPool = _poolManager.GetPool<SpalshPool>(this, _poolName);
+    }
+
+    private void OnDisable()
+    {
+        StopAllCoroutines();
+        if (_splashPool == null) return;
+
+        foreach (SpalshPool splash in GetComponentsInChildren<SpalshPool>(true))
+        {
+            if (splash.gameObject.activeSelf)
+                _splashPool.Return(splash);
+        }
+    }
+
+    private void OnDestroy()
+    {
+        if (_poolManager != null)
+            _poolManager.UnregisterPools(this);
     }
 
     // =========================================================

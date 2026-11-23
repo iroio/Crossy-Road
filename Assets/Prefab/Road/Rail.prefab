@@ -279,7 +279,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TrainGenerator
   _train: {fileID: 961943194646290550, guid: 5bf7743d60fb6324c87346f4367dc0d6, type: 3}
-  _root: {fileID: 0}
+  _root: {fileID: 76928694455600660}
   _spawnPoints:
   - {fileID: 4378730841592390195}
   - {fileID: 7400981479170007534}

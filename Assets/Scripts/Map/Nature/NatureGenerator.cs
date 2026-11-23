@@ -14,7 +14,8 @@ public class NatureGenerator : MonoBehaviour
 
     int _randomCount;
 
-    GameObjectPool<NaturesReturn>[] _naturesPools;
+    string[] _naturePoolNames;
+    ObjectPoolManager _poolManager;
 
     List<int> _naturePos = new List<int>();
 
@@ -23,9 +24,9 @@ public class NatureGenerator : MonoBehaviour
     // =========================================================
     private GameObjectPool<NaturesReturn> GetNaturePool()
     {
-        int random = Random.Range(0, _naturesPools.Length);
+        int random = Random.Range(0, _naturePoolNames.Length);
 
-        return _naturesPools[random];
+        return _poolManager.GetPool<NaturesReturn>(this, _naturePoolNames[random]);
     }
 
     // =========================================================
@@ -129,8 +130,7 @@ public class NatureGenerator : MonoBehaviour
     // =========================================================
     public void Removenature(NaturesReturn natures)
     {
-        natures.transform.SetParent(_root, true);
-        natures.OnReturn();
+        natures.ReturnToPool();
     }
 
     // =========================================================
@@ -138,19 +138,25 @@ public class NatureGenerator : MonoBehaviour
     // =========================================================
     void Awake()
     {
-        _naturesPools = new GameObjectPool<NaturesReturn>[_natures.Length];
+        _poolManager = ObjectPoolManager.Instance;
+        _naturePoolNames = new string[_natures.Length];
 
         int length = _natures.Length;
         for (int i = 0; i < length; i++)
         {
             GameObject prefab = _natures[i];
 
-            _naturesPools[i] = new GameObjectPool<NaturesReturn>(_root, _initialSize,
+            var pool = new GameObjectPool<NaturesReturn>(_root, _initialSize,
                 ()=> Instantiate(prefab, _root).GetComponent<NaturesReturn>());
 
-            // fix with AI
-            // fix: Register each nature pool to ObjectPoolManager
-            ObjectPoolManager.Instance.RegisterPool($"Nature{i}", _naturesPools[i]);
+            _naturePoolNames[i] = $"Nature{i}";
+            _poolManager.RegisterPool(this, _naturePoolNames[i], pool);
         }
+    }
+
+    void OnDestroy()
+    {
+        if (_poolManager != null)
+            _poolManager.UnregisterPools(this);
     }
 }

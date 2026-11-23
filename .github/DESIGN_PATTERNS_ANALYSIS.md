@@ -2,628 +2,299 @@
 
 ## 📋 개요
 
-**프로젝트명**: Crossy Road (Unity 6000.3.28f1)  
-**분석 범위**: Assets/Scripts의 ~40개 C# 파일  
-**분석 기준**: GoF 디자인 패턴, 아키텍처 패턴, 게임 개발 관례  
-**최종 분석**: 2026-11-20 (IPoolable 적용, ObjectPoolManager 통합 후)
+- **프로젝트명**: Crossy Road (Unity 6000.4.0f1)
+- **분석 범위**: `Assets/Scripts`의 C# 파일 33개, `Assets/Editor`의 에디터 스크립트 1개, 관련 씬·프리팹·`RowData` 에셋
+- **분석 기준**: 현재 작업 트리의 코드와 직렬화된 참조, GoF 디자인 패턴, Unity 게임 개발 관례
+- **최종 분석**: 2026-11-23
+
+**분석 방법**:
+- 코드와 에셋을 정적으로 확인했다. 이번 보고서 작성을 위한 새로운 플레이 테스트나 성능 측정은 하지 않았다.
+- GoF 패턴과 유사한 구조가 있어도 핵심 구조가 없으면 실제 적용으로 단정하지 않았다.
+- 스크립트의 기본값과 씬·프리팹에서 설정한 값은 구분했다.
 
 ---
 
 ## 1️⃣ 발견된 주요 디자인 패턴
 
-**패턴 목록** (8가지):
+**현재 구현 요약**:
+
 1. ✅ Singleton 패턴
-2. ✅ Object Pool 패턴 + IPoolable 인터페이스
-3. ✅ ObjectPoolManager 패턴 (신규)
-4. ✅ State 패턴
-5. ✅ Factory 패턴
-6. ✅ Strategy 패턴
-7. ✅ Observer/Callback 패턴 (IPoolable 콜백)
-8. ✅ Adapter 패턴
-9. ✅ Command 패턴 (부분)
+2. ✅ Object Pool 패턴과 `IPoolable` 생명주기 콜백
+3. ✅ ObjectPoolManager를 통한 소유자별 풀 레지스트리
+4. ✅ enum 기반 상태 관리 — GoF State 패턴은 아님
+5. ✅ 생성 책임 분리와 생성 함수 주입 — GoF Factory Method와 구별
+6. ✅ Unity 컴포넌트 조합과 데이터 기반 설계
+7. ⚠️ Strategy, Observer, Adapter, Command의 핵심 구조는 확인되지 않음
 
 ---
 
-### 1.1 **Singleton 패턴** ⭐ (가장 광범위하게 사용)
+### 1.1 **Singleton 패턴** ⭐
 
-**정의**: 애플리케이션 전역에서 단 하나의 인스턴스만 존재하는 클래스
+**정의**: 공통 서비스의 인스턴스를 하나로 유지하고 전역에서 접근하는 방식.
 
 **구현**:
-```
-파일: Assets/Scripts/Util/Singleton.cs
-상속 클래스:
-  ✓ GameManager (게임 상태 관리)
-  ✓ FadeManager (페이드 효과 관리)
-  ✓ ScenesManager (씬 전환 관리)
-  ✓ MouseManager (마우스 입력 관리)
-```
 
-**용도**:
-- 전역 접근이 필요한 Manager 클래스들
-- `Singleton<T>.Instance`로 어디서나 접근 가능
-- DontDestroyOnLoad 자동 적용
+- 파일: [Singleton.cs](../Assets/Scripts/Util/Singleton.cs)
+- `Instance`는 기존 컴포넌트를 찾고 없으면 GameObject를 생성한다.
+- `Awake()`에서 인스턴스를 지정하고 `DontDestroyOnLoad`를 적용한다. 중복 인스턴스는 파괴한다.
 
-**장점**:
-- ✅ 편리한 전역 접근
-- ✅ 중복 생성 방지
-- ✅ 씬 전환 시에도 유지
+**상속 클래스**:
 
-**잠재적 문제**:
-- ⚠️ 테스트 어려움
-- ⚠️ 전역 상태 의존성
-- ⚠️ 메모리 누수 가능성
+| 클래스 | 책임 |
+|---|---|
+| [GameManager](../Assets/Scripts/Manager/GameManager.cs) | 게임 상태·점수·최고 점수 |
+| [FadeManager](../Assets/Scripts/Manager/FadeManager.cs) | 페이드 연출 |
+| [ScenesManager](../Assets/Scripts/Manager/SceneManager.cs) | 씬 전환과 로딩 순서 |
+| [MouseManager](../Assets/Scripts/Util/MouseManager.cs) | Input System 마우스 상태 조회 |
+| [ObjectPoolManager](../Assets/Scripts/Manager/ObjectPoolManager.cs) | 풀 등록·조회 |
 
-**코드 예시**:
-```csharp
-public class Singleton<T> : MonoBehaviour where T : MonoBehaviour
-{
-    private static T _instance;
-    
-    public static T Instance
-    {
-        get
-        {
-            if (_instance == null)
-            {
-                _instance = FindAnyObjectByType<T>();
-                if (_instance == null)
-                {
-                    GameObject singletonObject = new GameObject(typeof(T).Name, typeof(T));
-                    _instance = singletonObject.GetComponent<T>();
-                }
-            }
-            return _instance;
-        }
-    }
-}
-```
+**특징 및 주의점**:
+
+- ✅ 5개 클래스가 공용 `Singleton<T>`를 사용한다.
+- ✅ [UIManager](../Assets/Scripts/Manager/UIManager.cs)는 정적 `_UM`을 사용하지만 `Singleton<T>`를 상속하지 않는 씬 범위 관리자다.
+- ⚠️ 정적 접근은 의존성과 초기화 순서를 파악하거나 테스트하기 어렵게 할 수 있다.
+- ⚠️ 자동 생성되는 컴포넌트의 직렬화 참조는 자동으로 채워지지 않는다. 예를 들어 `FadeManager`에는 `CanvasGroup` 설정이 필요하다.
+- ⚠️ 씬 전환 후에도 유지되는 관리자가 씬 객체를 참조할 때는 참조 수명을 확인해야 한다.
 
 ---
 
-### 1.2 **Object Pool 패턴** ⭐⭐⭐ (성능 최적화 핵심)
+### 1.2 **Object Pool 패턴** ⭐⭐⭐
 
-**정의**: 반복적으로 생성/삭제되는 오브젝트를 미리 풀에서 관리하여 메모리 할당 최소화
+**정의**: 사용한 객체를 바로 파괴하지 않고 보관해 이후 다시 사용하는 방식.
 
 #### **A. 핵심 구현**
 
-```
-파일: Assets/Scripts/Util/GameObjectPool.cs
-조건: where T : Component, IPoolable
+- 파일: [GameObjectPool.cs](../Assets/Scripts/Util/GameObjectPool.cs)
+- 제약: `T : Component, IPoolable`
+
+```text
+생성: 생성 함수 → OnCreate() → 선택적 생성 콜백 → 비활성화
+대여: Queue에서 꺼내기 또는 새로 생성 → 활성 목록 등록 → OnGet() → 활성화
+반환: 활성 목록에서 제거 → OnReturn() → 비활성화 → 풀 루트로 이동 → Queue
 ```
 
 **특징**:
-- 제네릭 기반: `GameObjectPool<T> where T : Component, IPoolable`
-- Queue<T>로 오브젝트 관리
-- HashSet<T>로 활성 오브젝트 추적
-- 풀 고갈 시 자동 생성
-- **IPoolable 인터페이스 필수**
 
-**코드 구조**:
-```csharp
-public class GameObjectPool<T> where T : Component, IPoolable
-{
-    readonly Queue<T> _pool = new Queue<T>();
-    readonly HashSet<T> _activeObjects = new HashSet<T>();
-    
-    private T CreateObject()
-    {
-        T obj = _createFunction();
-        if(obj == null)
-            throw new InvalidOperationException("Create function returned null.");
-        obj.OnCreate();      // IPoolable 콜백 1
-        obj.gameObject.SetActive(false);
-        return obj;
-    }
-    
-    public T Get()
-    {
-        // 풀에서 가져오기 또는 새로 생성
-        T obj = (_pool.Count > 0) ? _pool.Dequeue() : CreateObject();
-        _activeObjects.Add(obj);
-        obj.OnGet();         // IPoolable 콜백 2
-        obj.gameObject.SetActive(true);
-        return obj;
-    }
-    
-    public void Return(T obj)
-    {
-        if (obj == null || !_activeObjects.Remove(obj)) return;
-        obj.OnReturn();      // IPoolable 콜백 3
-        obj.gameObject.SetActive(false);
-        obj.transform.SetParent(_poolRoot);
-        _pool.Enqueue(obj);
-    }
-}
-```
+- 사용 가능한 객체는 `Queue<T>`, 대여 중인 객체는 `HashSet<T>`로 추적한다.
+- 풀이 부족하면 새 객체를 만든다. 현재 최대 크기나 축소 정책은 없다.
+- `Func<T>`는 객체 생성 방법을 제공하고, 선택적 `Action<T>`는 새 객체 생성 시 호출된다.
+- `IPoolable.OnGet()`은 풀 코드의 `SetActive(true)`보다 먼저 호출된다.
+- 유효하지 않거나 해당 풀에서 대여 중이 아닌 객체의 반환은 무시한다.
 
 #### **B. 전체 적용 현황**
 
-```
-사용 위치:
-  ✓ CarGenerator → CarMovement 풀 (10개 미리 생성)
-  ✓ LogGenerator → LogMovement 풀 (10개 미리 생성)
-  ✓ LotusGenerator → LotusMovement 풀 (10개 미리 생성)
-  ✓ TrainGenerator → TrainMovement 풀 (1개 미리 생성, 동적 확장)
-  ✓ NatureGenerator → NaturesReturn[] 풀 (10개씩 여러 타입)
-  ✓ MapGenerator → RowObject 풀 (10개씩 타입별)
-  ✓ RiverController → SpalshPool 풀 (5개 미리 생성)
-```
+아래 초기 크기는 **스크립트 기본값**이며 Inspector 설정에 따라 달라질 수 있다.
+
+| 사용 위치 | 풀 대상 | 기본 초기 크기 |
+|---|---|---:|
+| [CarGenerator](../Assets/Scripts/Map/Cars/CarGenerator.cs) | `CarMovement` | 10 |
+| [LogGenerator](../Assets/Scripts/Map/River/LogGenerator.cs) | `LogMovement` | 10 |
+| [LotusGenerator](../Assets/Scripts/Map/River/LotusGenerator.cs) | `LotusMovement` | 10 |
+| [TrainGenerator](../Assets/Scripts/Map/Train/TrainGenerator.cs) | `TrainMovement` | 1 |
+| [NatureGenerator](../Assets/Scripts/Map/Nature/NatureGenerator.cs) | `NaturesReturn` | 종류별 10 |
+| [MapGenerator](../Assets/Scripts/Map/MapGenerator.cs) | `RowObject` | 프리팹별 10 |
+| [RiverController](../Assets/Scripts/Map/River/RiverController.cs) | `SpalshPool` | 5 |
 
 #### **C. IPoolable 인터페이스 구현 현황**
 
-```
-📋 인터페이스 정의:
+파일: [IPoolable.cs](../Assets/Scripts/Interface/IPoolable.cs)
+
+```csharp
 public interface IPoolable
 {
-    void OnCreate();   // 처음 생성 시 호출
-    void OnGet();      // 풀에서 꺼낼 때 호출
-    void OnReturn();   // 풀로 반환할 때 호출
+    void OnCreate();
+    void OnGet();
+    void OnReturn();
 }
-
-✅ 구현 클래스 (9개):
-  1. CarMovement (자동차)
-     - OnCreate(): 없음
-     - OnGet(): 상태 초기화 (ResetState)
-     - OnReturn(): 없음
-  
-  2. LogMovement (나무통)
-     - OnCreate(): 없음
-     - OnGet(): 상태 초기화 (ResetState)
-     - OnReturn(): 없음
-  
-  3. LotusMovement (연꽃)
-     - OnCreate(): 없음
-     - OnGet(): 상태 초기화 (ResetState)
-     - OnReturn(): 없음
-  
-  4. TrainMovement (기차)
-     - OnCreate(): 없음
-     - OnGet(): 상태 초기화 (ResetState) ✓ 구현됨
-     - OnReturn(): 없음
-  
-  5. NaturesReturn (자연물)
-     - OnCreate(): 없음
-     - OnGet(): 없음
-     - OnReturn(): 비활성화 + 회전 초기화 ✓ 구현됨
-  
-  6. RowObject (맵 행) ⭐ **NEW**
-     - OnCreate(): 없음
-     - OnGet(): 없음
-     - OnReturn(): 없음
-  
-  7. SpalshPool (강 스플래시 이펙트)
-     - OnCreate(): ParticleSystem 초기화 ✓ 구현됨
-     - OnGet(): ParticleSystem Play() ✓ 구현됨
-     - OnReturn(): ParticleSystem Stop() ✓ 구현됨
-  
-  8. MouseManager (입력 관리)
-     - IPoolable 미구현 (Singleton만 사용)
-  
-  9. GameManager (게임 상태 관리)
-     - IPoolable 미구현 (Singleton만 사용)
 ```
 
-**상태 초기화 현황**:
-```
-⭐ 완전히 구현됨:
-  ✓ SpalshPool: ParticleSystem 완전 관리
-  ✓ TrainMovement: OnGet에서 ResetState() 호출
+**구현 클래스: 7개**
 
-⚠️ 부분 구현:
-  - CarMovement: OnGet 호출되지만 ResetState() 미구현
-  - LogMovement: OnGet 호출되지만 ResetState() 미구현
-  - LotusMovement: OnGet 호출되지만 ResetState() 미구현
-  - NaturesReturn: OnReturn에서만 상태 초기화
-  - RowObject: 콜백 구현 없음 (현재 상태 초기화 불필요)
-```
+| 클래스 | 주요 콜백 동작 |
+|---|---|
+| [CarMovement](../Assets/Scripts/Map/Cars/CarMovement.cs) | `OnGet`에서 목표 속도·감지 상태 초기화 |
+| [LogMovement](../Assets/Scripts/Map/River/LogMovement.cs) | `OnGet`에서 이동 방향 초기화 |
+| [LotusMovement](../Assets/Scripts/Map/River/LotusMovement.cs) | `OnGet`이 `ResetState`를 호출하지만 현재 내용은 비어 있음 |
+| [TrainMovement](../Assets/Scripts/Map/Train/TrainMovement.cs) | `OnGet`에서 시작 위치 필드를 `Vector3.zero`로 초기화 |
+| [NaturesReturn](../Assets/Scripts/Map/Nature/NaturesReturn.cs) | `OnReturn`에서 비활성화·회전 초기화 |
+| [RowObject](../Assets/Scripts/Map/RowObject.cs) | 세 콜백이 현재 비어 있음 |
+| [SpalshPool](../Assets/Scripts/Map/River/SplashPool.cs) | 파티클 참조 설정, 재생 및 정지 |
 
-**성능 효과**:
-- GC 압력 감소 (매 프레임 Instantiate/Destroy 제거)
-- 메모리 단편화 방지
-- 프레임 안정화 (특히 많은 오브젝트 생성/제거 필요한 부분)
+빈 콜백 자체가 문제라는 의미는 아니다. 다만 `Start()`는 객체 재사용마다 다시 실행되지 않으므로 필요한 상태가 매 대여 시 초기화되는지 확인해야 한다.
+
+**성능 해석**:
+
+- 풀링은 반복 생성·파괴를 줄일 수 있지만 초기 생성과 객체 보관 비용이 있다.
+- 모든 GC 할당이 사라지는 것은 아니며, 효과는 대상 프리팹과 실제 부하에 따라 달라진다.
+- [기존 Development Build 측정 보고서](../OBJECT_POOLING_MEASUREMENT_REPORT.md)는 풀 관리와 자연물 반환 경로가 변경되기 전의 통제된 실험이다. 해당 수치를 현재 구현이나 실제 플레이 전체에 그대로 적용할 수 없다.
 
 ---
 
 ### 1.3 **ObjectPoolManager 패턴** ⭐⭐ (풀 관리 중앙화)
 
-**정의**: 모든 오브젝트 풀을 중앙에서 등록하고 관리하는 Singleton
+**정의**: 여러 풀의 등록과 조회를 한 관리자에서 처리하는 레지스트리. GoF 공식 패턴명은 아니다.
 
-**구현**:
-```
-파일: Assets/Scripts/Manager/ObjectPoolManager.cs
-상속: Singleton<ObjectPoolManager>
-```
+**구현**: [ObjectPoolManager.cs](../Assets/Scripts/Manager/ObjectPoolManager.cs)
 
-**기능**:
 ```csharp
-public class ObjectPoolManager : Singleton<ObjectPoolManager>
-{
-    private Dictionary<string, object> _pools = new Dictionary<string, object>();
-    
-    // 풀 등록
-    public void RegisterPool<T>(String poolName, GameObjectPool<T> pool)
-        where T : Component, IPoolable
-    
-    // 풀 조회
-    public GameObjectPool<T> GetPool<T>(string poolName)
-        where T : Component, IPoolable
-    
-    // 풀 통계 출력
-    public void PrintPoolStatistics()
-}
+// 소유자별 등록과 조회
+manager.RegisterPool(this, "Car", pool);
+GameObjectPool<CarMovement> carPool = manager.GetPool<CarMovement>(this, "Car");
+
+// 소유자가 파괴될 때 등록 해제
+manager.UnregisterPools(this);
 ```
 
-**등록된 풀 목록**:
-```
-✅ 현재 등록된 풀 (7개 타입):
-  1. "Cars" (CarMovement) - CarGenerator.cs에서 등록
-  2. "Logs" (LogMovement) - LogGenerator.cs에서 등록
-  3. "Lotus" (LotusMovement) - LotusGenerator.cs에서 등록
-  4. "Train" (TrainMovement) - TrainGenerator.cs에서 등록
-  5. "Nature0", "Nature1", ... (NaturesReturn) - NatureGenerator.cs에서 등록
-  6. "Splash" (SpalshPool) - RiverController.cs에서 등록
-  7. "Row*" (RowObject) - MapGenerator.cs에서 등록 (프리팹별)
+**동작**:
 
-🔍 등록 위치 추적:
-  - CarGenerator: OnInit() → RegisterPool("Cars", _carsPools)
-  - LogGenerator: OnInit() → RegisterPool("Logs", _logsPools)
-  - LotusGenerator: OnInit() → RegisterPool("Lotus", _lotusPools)
-  - TrainGenerator: OnInit() → RegisterPool("Train", _trainPool)
-  - NatureGenerator: OnInit() → RegisterPool($"Nature{i}", ...)
-  - RiverController: Start() → RegisterPool("Splash", _splashPool)
-  - MapGenerator: GetRow() → RegisterPool($"Row{prefab.name}", ...)
+```text
+CarGenerator A ── RegisterPool(A, "Car", 풀 A) ──┐
+                                                  ├─ ObjectPoolManager
+CarGenerator B ── RegisterPool(B, "Car", 풀 B) ──┘
+                     └─ GetPool(B, "Car") → 풀 B
 ```
 
-**사용 패턴**:
-```csharp
-// 등록 (각 Generator의 초기화 단계)
-ObjectPoolManager.Instance.RegisterPool("Cars", _carsPools);
+- 관리자 키는 **소유 컴포넌트와 풀 이름**의 조합이다. 같은 이름의 생성기가 여러 행에 있어도 서로의 풀을 덮어쓰지 않는다.
+- 차량·통나무·연꽃·열차 생성기와 `RiverController`는 최초 `OnEnable`에서 풀을 만들고 등록한 뒤, 활성화 시 관리자로부터 조회한다.
+- `NatureGenerator`는 `Awake`에서 종류별로 등록하고, `GetNature()`에서 조회한다.
+- `MapGenerator`는 행 프리팹을 처음 사용할 때 등록하고 행 생성·반환 시 조회한다. 프리팹 참조별 순번을 사용하므로 이름이 같은 서로 다른 프리팹도 구분한다.
+- 생성기나 관리자가 파괴될 때 자기 소유 등록을 해제한다. 비활성화 후 재활성화에는 기존 풀을 사용한다.
+- 소유자 범위 API는 중복 등록, 누락 및 타입 불일치를 예외로 알린다. 기존 이름만 사용하는 API도 별도로 남아 있다.
+- `PrintPoolStatistics()`는 이름과 타입을 출력한다. 활성 수·잔여 수의 통합 출력은 현재 없다.
 
-// 조회 (필요한 경우)
-GameObjectPool<CarMovement> carPool = 
-    ObjectPoolManager.Instance.GetPool<CarMovement>("Cars");
-
-// 통계 (디버깅)
-ObjectPoolManager.Instance.PrintPoolStatistics();
-```
-
-**역할**:
-- ✅ 모든 풀의 중앙 집중식 관리
-- ✅ 풀 접근 시 타입 안전성 보장 (제네릭)
-- ✅ 디버깅 및 모니터링 용이
-- ✅ 향후 풀 통계, 메모리 최적화 가능
+**중요한 구분**: 각 생성기가 소유한 개별 풀을 중앙에서 조회하는 구조이며, 모든 생성기가 하나의 전역 풀을 공유하는 방식은 아니다.
 
 ---
 
-### 1.4 **State 패턴** ⭐⭐
+### 1.4 **State 관련 구조** ⭐⭐ (enum 기반 상태 관리)
 
-**정의**: 객체의 상태에 따라 행동을 다르게 하는 패턴
+**구현**: [GameManager.cs](../Assets/Scripts/Manager/GameManager.cs)
 
-**구현**:
-```
-파일: Assets/Scripts/Manager/GameManager.cs
-게임 상태 enum:
-  enum GameState
-  {
-      Main,      // 메인 화면
-      Playing,   // 게임 플레이 중
-      GameOver   // 게임 오버
-  }
+```csharp
+public enum GameState
+{
+    Main,
+    Playing,
+    GameOver
+}
 ```
 
 **상태 전이 흐름**:
-```
-Main 
-  ↓ (클릭) → Playing
-         ↓ (사망) → GameOver
-                  ↓ (버튼 클릭) → (씬 전환) → Main
+
+```text
+Main ── 클릭 / StartGame() ──→ Playing
+Playing ── 충돌·낙하 등 / GameOver() ──→ GameOver
+GameOver ── 재시도 / 씬 전환 / ResetGame() ──→ Main
 ```
 
-**상태별 동작**:
-```csharp
-public void ChangeState(GameState state)
-{
-    CurrentState = state;
-    
-    switch (state)
-    {
-        case GameState.Main:
-            UIManager._UM.ShowMain();        // 메인 UI 표시
-            break;
-        case GameState.Playing:
-            UIManager._UM.ShowPlaying();     // 플레이 UI 표시
-            break;
-        case GameState.GameOver:
-            UIManager._UM.ShowGameOver();    // 결과 UI 표시
-            break;
-    }
-}
+- `ChangeState()`는 enum 값을 설정하고 `switch`로 UI 메서드를 호출한다.
+- `PlayerController`, `CameraTargetController` 등은 게임 상태를 확인한다.
+- `MapManager.Update()`는 코드상 게임 상태를 검사하지 않고 `CheckPos()`를 호출한다.
+
+**판정**: 상태 객체와 공통 상태 인터페이스에 행동을 위임하는 GoF State 패턴이 아니라 **enum 기반 상태 분기**다.
+
+---
+
+### 1.5 **Factory 관련 구조** ⭐ (생성 책임 분리)
+
+**구현**:
+
+```text
+MapGenerator    → 행 선택과 행 풀 사용
+CarGenerator    → 차량 생성과 반환
+LogGenerator    → 통나무 생성과 반환
+LotusGenerator  → 연꽃 생성과 반환
+TrainGenerator  → 열차 생성과 반환
+NatureGenerator → 자연물 종류 선택과 반환
 ```
+
+각 생성기는 `GameObjectPool<T>`에 프리팹 생성 함수를 전달하고 생성·배치·반환을 담당한다. `MapGenerator`는 가중치로 `RowData`도 선택한다.
+
+**판정**: 생성 책임 분리와 생성 함수 주입은 적용되어 있다. 공통 Creator의 생성 메서드를 하위 클래스에서 재정의하는 GoF Factory Method 구조로는 분류하지 않는다.
+
+---
+
+### 1.6 **Strategy 패턴** (적용 확인되지 않음)
+
+차량·통나무·열차는 각각 다른 이동 로직을 갖지만, 공통 전략 인터페이스를 통해 알고리즘 객체를 교체하는 구조는 확인되지 않는다. `RowType`에 따른 행 선택도 데이터와 조건 분기다.
+
+**판정**: 서로 다른 컴포넌트나 조건 분기가 있다는 사실만으로 Strategy 패턴을 적용했다고 볼 수 없다.
+
+---
+
+### 1.7 **Observer / Callback 관련 구조** ⭐⭐
+
+**구현**: `GameObjectPool<T>`가 `IPoolable`의 `OnCreate`, `OnGet`, `OnReturn`과 선택적 `Action<T>`를 직접 호출한다. Unity의 `OnEnable`, `OnDisable`, `OnTriggerEnter` 등도 엔진이 호출하는 콜백이다.
 
 **특징**:
-- 각 상태마다 UI 연동
-- PlayerController에서 상태 확인: `if (GameManager.Instance.IsGameOver)`
-- MapManager에서 상태에 따른 처리
+
+- ✅ 풀은 구체 객체별 초기화 내용을 몰라도 공통 인터페이스를 호출할 수 있다.
+- ✅ `SpalshPool`은 생성·대여·반환 콜백에서 파티클을 관리한다.
+- ⚠️ 생성 콜백 `Action<T>`는 매 대여가 아니라 **새 객체 생성 시** 실행된다.
+
+**판정**: 현재는 **생명주기 콜백**이다. 여러 구독자의 등록·해제와 알림을 갖는 자체 Observer 이벤트 시스템은 분석 범위에서 확인되지 않았다.
 
 ---
 
-### 1.5 **Factory 패턴** ⭐
+### 1.8 **Adapter 패턴** (적용 확인되지 않음)
 
-**정의**: 객체 생성을 별도의 클래스/메서드에 위임
-
-**구현 1 - Generator 클래스들**:
-```
-CarGenerator    → CarMovement 오브젝트 생성/제거
-LogGenerator    → LogMovement 오브젝트 생성/제거
-LotusGenerator  → LotusMovement 오브젝트 생성/제거
-TrainGenerator  → TrainMovement 오브젝트 생성/제거
-NatureGenerator → 다양한 Nature 오브젝트 생성/제거
-MapGenerator    → RowObject 오브젝트 생성/제거
-```
-
-**구현 2 - Weighted Random Selection**:
-```csharp
-// MapGenerator.GetRandomRow()
-// 가중치 기반으로 행의 타입 선택
-private RowData GetRandomRow()
-{
-    int totalWeight = 0;
-    foreach (var row in _rowDatas)
-        totalWeight += row.weight;
-    
-    int randomValue = Random.Range(0, totalWeight);
-    int currentWeight = 0;
-    
-    foreach (var row in _rowDatas)
-    {
-        currentWeight += row.weight;
-        if (randomValue < currentWeight)
-            return row;  // 선택된 행 반환
-    }
-}
-```
-
-**특징**:
-- 가중치 기반 확률 선택
-- 각 Generator가 자신의 오브젝트 생성 담당
-- 오브젝트 풀과 결합
+`GameObjectPool<T>`가 제네릭 제약과 `IPoolable`을 사용하고 `MouseManager`가 마우스 조회를 감싸지만, 기존 인터페이스를 다른 인터페이스로 변환하는 GoF Adapter 객체는 확인되지 않는다.
 
 ---
 
-### 1.6 **Strategy 패턴** ⭐
+### 1.9 **Command 패턴** (적용 확인되지 않음)
 
-**정의**: 행동을 캡슐화하여 런타임에 선택
-
-**구현 - 이동 전략**:
-```csharp
-// CarMovement - 자동차 이동 전략
-// LogMovement - 나무통 이동 전략
-// TrainMovement - 기차 이동 전략
-
-// 각각 다른 이동 로직:
-// Car: 앞 차 감지하여 속도 조절 (CheckFront())
-// Log: 양방향 이동
-// Train: 직선 이동, 거리 기반 삭제
-```
-
-**또 다른 예 - 행(Row) 생성 전략**:
-```csharp
-enum RowType
-{
-    Grass,   // 풀밭 + 자연물
-    Road,    // 도로 + 자동차
-    Rail,    // 철로 + 기차
-    River1,  // 강 + 나무통
-    River2   // 강 + 연꽃
-}
-
-// 각 RowType마다 다른 생성 전략
-// MapGenerator에서 RowType에 따라 다른 행 생성
-```
-
----
-
-### 1.7 **Observer/Callback 패턴** ⭐⭐ (IPoolable 콜백)
-
-**정의**: 오브젝트 풀의 생명주기 이벤트를 콜백으로 처리
-
-**구현 - IPoolable 인터페이스**:
-```csharp
-public interface IPoolable
-{
-    void OnCreate();   // 처음 생성될 때 호출 (초기화)
-    void OnGet();      // 풀에서 꺼낼 때 호출 (활성화/준비)
-    void OnReturn();   // 풀로 반환할 때 호출 (정리/비활성화)
-}
-
-// GameObjectPool에서 자동 호출
-private T CreateObject()
-{
-    T obj = _createFunction();
-    obj.OnCreate();      // ← 첫 생성 시 초기화
-    obj.gameObject.SetActive(false);
-    return obj;
-}
-
-public T Get()
-{
-    T obj = ...
-    obj.OnGet();         // ← 사용 시 준비
-    obj.gameObject.SetActive(true);
-    return obj;
-}
-
-public void Return(T obj)
-{
-    obj.OnReturn();      // ← 반환 시 정리
-    obj.gameObject.SetActive(false);
-    _pool.Enqueue(obj);
-}
-```
-
-**활용 사례**:
-```csharp
-// 1. SpalshPool: 완전한 콜백 구현
-public class SpalshPool : MonoBehaviour, IPoolable
-{
-    ParticleSystem _ps;
-    
-    public void OnCreate()
-    {
-        _ps = GetComponent<ParticleSystem>();
-    }
-    
-    public void OnGet()
-    {
-        _ps.Play();      // 활성화 시 파티클 재생
-    }
-    
-    public void OnReturn()
-    {
-        _ps.Stop();      // 비활성화 시 파티클 정지
-    }
-}
-
-// 2. TrainMovement: OnGet에서 상태 초기화
-public class TrainMovement : MonoBehaviour, IPoolable
-{
-    Vector3 _startPos;
-    
-    public void OnGet()
-    {
-        ResetState();    // 꺼낼 때 위치 초기화
-    }
-}
-
-// 3. RowObject: 현재 콜백 미구현 (상태 초기화 불필요)
-public class RowObject : MonoBehaviour, IPoolable
-{
-    public void OnCreate() { }
-    public void OnGet() { }
-    public void OnReturn() { }
-}
-```
-
-**특징**:
-- ✅ 각 오브젝트의 생명주기 이벤트 처리
-- ✅ GameObjectPool의 Get/Return과 자동 연동
-- ✅ 느슨한 결합: 풀은 IPoolable만 의존
-- ⚠️ 현재 부분적 구현 (일부 클래스만 콜백 사용)
-
----
-
-### 1.8 **Adapter 패턴** (암묵적)
-
-**구현 - Component 추상화**:
-```csharp
-// GameObjectPool은 Component를 기반으로 모든 타입 처리
-public class GameObjectPool<T> where T : Component, IPoolable
-{
-    // RowObject, CarMovement, NaturesReturn 등
-    // 모두 Component를 상속하므로 통일된 인터페이스로 처리
-    
-    obj.gameObject.SetActive(false);    // ← Component 활용
-    obj.transform.SetParent(_poolRoot);  // ← Component 활용
-}
-```
-
-**특징**:
-- ✅ 다양한 타입을 Component 인터페이스로 통일
-- ✅ 타입 안전성 유지 (제네릭)
-
----
-
-### 1.9 **Command 패턴** (부분 적용)
-
-**구현 - UI 버튼 액션**:
-```csharp
-public void OnClickRetry()
-{
-    ScenesManager.Instance.LoadScene("Game");  // ← 커맨드 캡슐화
-}
-
-// 버튼의 onClick.AddListener(() => OnClickRetry());
-```
+`UIManager.OnClickRetry()`는 `ScenesManager.LoadScene("Game")`을 직접 호출한다. 요청을 별도 명령 객체로 캡슐화하고 실행·보관하는 Command 구조는 확인되지 않는다.
 
 ---
 
 ## 2️⃣ 아키텍처 패턴
 
-### 2.1 **Manager 패턴** (MVC 변형)
+### 2.1 **Manager와 컴포넌트 기반 역할 분리**
 
-```
-Pool 관리 계층 (신규 추가):
-└─ ObjectPoolManager    (모든 풀의 중앙 집중식 관리, Singleton)
-   ├─ RegisterPool()    (풀 등록)
-   └─ GetPool()         (풀 조회)
+```text
+Manager / 조율:
+├─ GameManager       게임 상태·점수                         Singleton
+├─ UIManager         씬 UI 화면·입력                        씬 범위
+├─ ScenesManager     씬 전환                                Singleton
+├─ FadeManager       화면 페이드                            Singleton
+├─ MapManager        행 생성·반환 조율                      씬 컴포넌트
+├─ MouseManager      마우스 입력 조회                       Singleton
+└─ ObjectPoolManager 소유자별 풀 등록·조회                   Singleton
 
-Manager 계층 (조율):
-├─ GameManager          (게임 상태 & 점수 관리, Singleton)
-├─ UIManager            (UI 화면 전환, 장면 스코프)
-├─ ScenesManager        (씬 로딩 & 페이드, Singleton)
-├─ FadeManager          (화면 페이드 효과, Singleton)
-├─ MapManager           (맵 생성/삭제 조율, Singleton)
-├─ MouseManager         (마우스 입력, Singleton)
-└─ LodingManager        (로딩 연출, Singleton)
+Generator / 생성:
+├─ MapGenerator, NatureGenerator
+├─ CarGenerator, LogGenerator, LotusGenerator, TrainGenerator
+└─ RiverController: 강 충돌 처리와 Splash 풀
 
-Generator 계층 (생성 로직):
-├─ MapGenerator         (맵 행 생성, 풀 관리, ObjectPoolManager 등록)
-├─ CarGenerator         (자동차 생성 & 풀, ObjectPoolManager 등록)
-├─ LogGenerator         (나무통 생성 & 풀, ObjectPoolManager 등록)
-├─ LotusGenerator       (연꽃 생성 & 풀, ObjectPoolManager 등록)
-├─ TrainGenerator       (기차 생성 & 풀, ObjectPoolManager 등록)
-├─ NatureGenerator      (자연물 생성 & 풀, ObjectPoolManager 등록)
-└─ RiverController      (강 로직 & Splash 풀, ObjectPoolManager 등록)
+Component / 실행:
+├─ PlayerController, CameraTargetController
+├─ CarMovement, LogMovement, LotusMovement, TrainMovement
+├─ RowObject, NaturesReturn, SpalshPool
+└─ CrossingGateMovement
 
-Movement/Component 계층 (실행 로직, IPoolable 구현):
-├─ PlayerController     (플레이어 조작)
-├─ CarMovement          (자동차 이동, IPoolable 구현)
-├─ LogMovement          (나무통 이동, IPoolable 구현)
-├─ LotusMovement        (연꽃 이동, IPoolable 구현)
-├─ TrainMovement        (기차 이동, IPoolable 구현)
-├─ RowObject            (맵 행, IPoolable 구현)
-├─ NaturesReturn        (자연물, IPoolable 구현)
-├─ SpalshPool           (스플래시 이펙트, IPoolable 구현)
-└─ CrossingGateMovement (철로 게이트)
-
-Utility & Interface 계층:
-├─ GameObjectPool<T>    (제네릭 오브젝트 풀, IPoolable 필수)
-├─ IPoolable            (풀 생명주기 콜백 인터페이스)
-├─ Singleton<T>         (싱글톤 기반)
-└─ MouseManager         (입력 추상화, Singleton)
-
-데이터 계층:
-└─ RowData (ScriptableObject, 맵 행 설정)
+공용 기능과 데이터:
+├─ GameObjectPool<T>, IPoolable, Singleton<T>
+└─ RowData ScriptableObject
 ```
 
-**아키텍처 개선사항**:
-- ✅ ObjectPoolManager: 모든 풀 중앙 관리 추가
-- ✅ IPoolable: 모든 풀에 사용되는 오브젝트가 구현
-- ✅ 각 Generator: ObjectPoolManager에 풀 등록
-- ✅ 명확한 계층 분리: Manager → Generator → Component
+`LodingManager_Del`도 코드에 존재하지만 `MonoBehaviour`이며 Singleton이 아니다. 위 구조는 명확히 분리된 MVC 구현보다는 Unity 컴포넌트의 역할 분리와 관리자 간 직접 호출에 가깝다.
 
 ### 2.2 **Data-Driven Design**
 
-**ScriptableObject 활용**:
-```csharp
-[CreateAssetMenu(menuName = "Map/Row Data")]
-public class RowData : ScriptableObject
-{
-    public RowType rowType;      // 행의 타입
-    public GameObject prefab;    // 프리팹
-    public int weight;           // 생성 확률 가중치
-    public int minRepeat;        // 최소 반복 개수
-    public int maxRepeat;        // 최대 반복 개수
-}
+[RowData.cs](../Assets/Scripts/Map/RowData.cs)의 ScriptableObject가 행 종류·프리팹·가중치·반복 범위를 보관한다. `MapGenerator`는 설정 검증 후 가중치 합계에서 난수를 뽑아 행 종류를 선택한다.
 
-// MapGenerator에서 List<RowData>로 관리
-// 게임 로직과 데이터 분리
-```
+**현재 [Game 씬](../Assets/Scenes/Game.unity)의 참조 에셋**:
 
-**이점**:
-- 로직 변경 없이 데이터만 수정 가능
-- 디자이너 친화적
-- 반복 생성 패턴 간편하게 설정
+| 에셋 | 행 종류 | 선택 가중치 | 반복 범위 |
+|---|---|---:|---:|
+| [Asphalt](../Assets/Scripts/ScriptaleObject/Asphalt.asset) | Road | 30 | 1~2 |
+| [GrassData](../Assets/Scripts/ScriptaleObject/GrassData.asset) | Grass | 40 | 1~2 |
+| [RailData](../Assets/Scripts/ScriptaleObject/RailData.asset) | Rail | 10 | 1 |
+| [River1Data](../Assets/Scripts/ScriptaleObject/River1Data.asset) | River1 | 15 | 1 |
+| [River2Data](../Assets/Scripts/ScriptaleObject/River2Data.asset) | River2 | 5 | 1 |
+
+가중치 합이 100이므로 한 번의 **종류 선택** 비율은 각각 30%, 40%, 10%, 15%, 5%다. Road와 Grass는 1~2개 행을 반복 생성할 수 있으므로 실제 생성된 **개별 행 비율**은 선택 비율과 같다고 단정할 수 없다.
 
 ---
 
@@ -631,95 +302,72 @@ public class RowData : ScriptableObject
 
 ### 3.1 **Pool & Reuse 패턴**
 
-```
-Spawn → Use → Destroy(실제로는 Deactivate) → Pool Return
-                                                    ↓
-                                                  Reset ↓
-                                            Get(활성화) ← Reuse
+```text
+생성 또는 대여 → 사용 → Return() → 비활성화·보관 → Get() → 재사용
 ```
 
-**구현 로직**:
-```csharp
-// Get: 활성화
-var obj = pool.Get();
-obj.gameObject.SetActive(true);
+행 반환 시 자연물은 다음 경로로 원래 풀에 돌아간다.
 
-// Return: 비활성화 & 풀로 반환
-pool.Return(obj);
-obj.gameObject.SetActive(false);
+```text
+MapGenerator.ReleaseRow()
+  → NatureGenerator.Removenature()
+    → NaturesReturn.ReturnToPool()
+      → GameObjectPool.Return()
 ```
 
 ### 3.2 **Generator-Manager 협업 패턴**
 
-```
-Generator (생성 담당)
-  ├─ Spawn 메서드: 새 오브젝트 생성
-  ├─ Remove 메서드: 오브젝트 풀 반환
-  └─ 초기화 콜백: 각 오브젝트에 Generator 참조 전달
+- `MapManager`는 행을 큐에 보관하고 플레이어 위치에 따라 생성·반환을 조율한다.
+- `MapGenerator`는 행 데이터를 선택하고 행을 대여하며, 각 행의 생성기가 해당 오브젝트를 담당한다.
+- `ObjectPoolManager`는 생성기별 풀의 등록·조회와 소유자 파괴 시 등록 해제를 지원한다.
+- `RiverController`는 비활성화 시 코루틴을 중지하고 활성 Splash를 반환한다.
 
-Manager (조율 담당)
-  └─ Generator들의 Spawn/Remove를 적절히 호출
-     (예: MapManager가 MapGenerator 조율)
-```
+### 3.3 **Input-Action 관련 구조**
 
-### 3.3 **Input-Action Pattern**
+`MouseManager`는 `Mouse.current`를 감싸 클릭·누름·릴리즈와 위치를 제공한다. `UIManager`는 클릭으로 게임을 시작하고, `PlayerController`는 입력 값을 이용해 스와이프와 이동을 처리한다. 현재 교체 가능한 입력 전략 구현체나 별도 Command 객체는 확인되지 않는다.
 
-```
-MouseManager (입력 추상화)
-  ├─ IsClicking() → 프레임 내 클릭 감지
-  ├─ IsReleasing() → 프레임 내 릴리즈 감지
-  ├─ IsHolding() → 현재 누르는 상태
-  └─ GetMousePosition() → 마우스 위치
+### 3.4 **Marker Component**
 
-PlayerController (사용)
-  └─ SwipeInput() → MouseManager 활용하여 스와이프 감지
-  
-UIManager (사용)
-  └─ Update에서 MouseManager 활용하여 게임 시작
-```
+[RidePlatform](../Assets/Scripts/Map/Marker_Component/RidePlatform.cs)은 비어 있는 마커 컴포넌트다. `LogMovement`와 `LotusMovement`가 이를 상속하고 `PlayerController`는 충돌체 부모에서 이 컴포넌트를 찾아 탑승 대상을 식별한다.
 
 ---
 
 ## 4️⃣ 각 패턴의 상호작용
 
-### 흐름 예시 1: 게임 시작
+### 흐름 예시 1: 게임 시작과 행 생성
 
-```
+```text
 1. UIManager.Update()
-   └─ MouseManager.IsClicking() 감지
+   └─ MouseManager.IsClicking()
+      └─ GameManager.StartGame() → Playing / UI 갱신
 
-2. GameManager.StartGame()
-   └─ ChangeState(GameState.Playing)
-
-3. MapManager.CheckPos()
+2. MapManager.CheckPos()
    └─ MapGenerator.SpawnRow()
-      └─ GetRandomRow() (Factory 패턴)
-      └─ GetRow() (Object Pool)
+      ├─ RowData 가중치 선택 및 반복 횟수 결정
+      ├─ ObjectPoolManager에서 행 풀 조회 → Get()
+      └─ Grass인 경우 NatureGenerator에서 자연물 대여
 
-4. 각 Generator의 SpawnCar/SpawnLog 등 호출
-   └─ GameObjectPool<T>.Get()
-      └─ 콜백: InitCar/InitLog 등 실행
+3. 행에 있는 Generator의 활성화
+   └─ 소유자별 풀 등록 또는 조회 → 객체 대여
 ```
 
-### 흐름 예시 2: 플레이어 사망
+`MapManager.CheckPos()`는 코드상 게임 상태로 제한되지 않는다. 또한 생성 콜백으로 생성기 참조를 주입하는 작업은 새 풀 객체를 만들 때 일어나며 매 대여 시 발생하지 않는다.
 
-```
-1. RiverController.OnTriggerEnter()
-   └─ PlaySplash() (Object Pool 사용)
-   └─ GameManager.GameOver() (State 패턴)
+### 흐름 예시 2: 플레이어 사망과 재시도
 
-2. GameManager.ChangeState(GameState.GameOver)
-   └─ UIManager.ShowGameOver()
+```text
+1. PlayerController 또는 RiverController가 충돌·낙하 등을 감지
+   └─ GameManager.GameOver() → GameOver / 결과 UI 갱신
 
-3. PlayerController.RemoveFromPlatform()
-   └─ 각 Generator의 Remove 메서드 호출
-   └─ GameObjectPool<T>.Return()
-      └─ 모든 오브젝트 풀로 복원
+2. 강 충돌인 경우 RiverController.PlaySplash()
+   └─ Splash 풀에서 대여 → 지연 후 반환
 
-4. UIManager.OnClickRetry()
+3. UIManager.OnClickRetry()
    └─ ScenesManager.LoadScene("Game")
-   └─ 모든 풀 재초기화
+      └─ 페이드·로딩 → GameManager.ResetGame() → Main
 ```
+
+행 반환과 탑승 해제는 `MapManager.RemoveOldRows()` 등의 조건에 따라 별도로 실행된다. `GameOver()`가 모든 풀 객체를 즉시 반환하는 흐름은 아니다.
 
 ---
 
@@ -727,92 +375,65 @@ UIManager (사용)
 
 ### 강점
 
-| 항목 | 평가 | 이유 |
-|------|------|------|
-| **패턴 사용** | ⭐⭐⭐⭐⭐ | Singleton, Object Pool, State, Factory, Strategy, IPoolable 조화롭게 적용 |
-| **성능 최적화** | ⭐⭐⭐⭐⭐ | 광범위한 Object Pool + IPoolable 콜백으로 GC 압력 최소화 |
-| **확장성** | ⭐⭐⭐⭐⭐ | 새 Generator 추가 시 ObjectPoolManager 등록만으로 완성 |
-| **코드 가독성** | ⭐⭐⭐⭐⭐ | 명확한 계층 분리: Manager → Generator → Component |
-| **메모리 관리** | ⭐⭐⭐⭐⭐ | Object Pool + Singleton + IPoolable 콜백으로 최적화 |
-| **풀 중앙화** | ⭐⭐⭐⭐ | ObjectPoolManager로 모든 풀을 통합 관리 |
-| **타입 안전성** | ⭐⭐⭐⭐⭐ | 제네릭 + IPoolable 제약으로 완벽한 타입 보호 |
+| 항목 | 현재 구조 | 장점 |
+|---|---|---|
+| 객체 재사용 | `GameObjectPool<T>`와 7개 `IPoolable` 타입 | 반복 생성·파괴를 줄일 수 있음 |
+| 풀 관리 | 소유 컴포넌트와 이름으로 등록·조회 | 여러 행의 같은 이름 풀이 충돌하지 않음 |
+| 행 설정 | `RowData` ScriptableObject | 가중치·반복 범위·프리팹을 데이터로 설정 |
+| 역할 분리 | Manager, Generator, Movement 컴포넌트 | 조율·생성·동작의 책임을 구분 |
+| 생명주기 | `IPoolable` 콜백 | 풀과 객체별 초기화 로직을 구분 |
 
 ### 개선 가능 영역
 
-| 항목 | 현재 상태 | 권장 개선 |
-|------|---------|---------|
-| **IPoolable 콜백** | ⚠️ 부분적 구현 | CarMovement, LogMovement, LotusMovement에서 OnGet에 ResetState() 추가 |
-| **이벤트 시스템** | ✓ 콜백 사용 | EventSystem/UnityEvent 도입 검토 (향후) |
-| **의존성 주입(DI)** | ✗ 미적용 | Singleton 의존성 감소 (대규모 프로젝트일 경우) |
-| **패턴 주석** | ✗ 없음 | 각 패턴 주석 추가로 문서화 개선 |
-| **ObjectPoolManager 활용** | ✓ 등록만 | GetPool 메서드 활용도 증대 |
+| 항목 | 현재 상태 | 권장 확인 |
+|---|---|---|
+| 열차 재사용 | `OnGet()`에서 시작 위치를 원점으로 설정하며 `Start()`는 재사용 시 다시 호출되지 않음 | 새 스폰 위치를 기준으로 거리 판정이 이뤄지는지 플레이 테스트 |
+| Splash 콜백 | 풀의 `Get()`과 `RiverController.PlaySplash()`가 각각 `OnGet()` 호출 | 파티클 재생에 미치는 영향과 의도 확인 |
+| 객체별 초기화 | 차량·통나무의 속도는 `Start()`에서 설정, 연꽃 `ResetState()`는 비어 있음 | 재사용 시 의도한 값이 유지·초기화되는지 검토 |
+| 풀 관측성 | 관리자가 이름과 타입만 출력 | 필요 시 활성 수·잔여 수·확장 횟수 진단 검토 |
+| 전역 의존성 | 싱글톤과 직접 호출 사용 | 테스트나 초기화 문제가 실제로 발생할 때 의존성 분리 검토 |
 
 ### 현재 구현 현황 분석
 
-**✅ 완벽히 구현된 부분**:
-1. Singleton 패턴 (8개 Manager 클래스)
-2. Object Pool 패턴 (GameObjectPool<T> 제네릭 구현)
-3. ObjectPoolManager (모든 풀 중앙 등록)
-4. IPoolable 인터페이스 (9개 클래스 구현)
-5. State 패턴 (GameState enum)
-6. Factory 패턴 (Generator 클래스들)
-7. Strategy 패턴 (Movement 클래스들)
-8. Data-Driven Design (RowData ScriptableObject)
+**✅ 확인된 부분**:
 
-**⚠️ 부분 구현된 부분**:
-1. IPoolable 콜백 활용도
-   - SpalshPool: 완벽한 구현 ✓
-   - TrainMovement: OnGet에서 ResetState() ✓
-   - CarMovement, LogMovement, LotusMovement: 콜백 미사용 ⚠️
-   - RowObject, NaturesReturn: 최소한 구현 ✓
+1. `Singleton<T>` 상속 클래스 5개와 씬 범위 `UIManager`
+2. `GameObjectPool<T>`와 `IPoolable` 구현 클래스 7개
+3. 소유자별 풀 등록·조회·등록 해제 및 자연물의 실제 풀 반환
+4. `RowData` 기반 가중치 선택과 enum 기반 게임 상태 관리
+5. 생성 함수 주입, 생명주기 콜백, Unity 컴포넌트 조합
 
-2. MouseManager 입력 처리
-   - IsClicking(), IsReleasing(), IsHolding() 구현됨
-   - 클릭 감지 시 게임 상태 변경 연동
+**⚠️ 구분이 필요한 부분**:
 
-**🔴 발견된 문제**:
-1. ~~Row 생성 시 RowObject 클래스 부재~~ → **해결됨** (RowObject.cs 생성)
-2. MapGenerator의 GetRow() 메서드에서 풀 첫 생성 시 ObjectPoolManager 등록
+1. enum 상태 분기와 GoF State는 다르다.
+2. 생성기와 GoF Factory Method, 직접 콜백과 Observer는 각각 다르다.
+3. Strategy, Adapter, Command는 현재 코드에서 적용으로 확인하지 못했다.
+4. 현재 작업 트리의 [Rail.prefab](../Assets/Prefab/Road/Rail.prefab)에는 `TrainGenerator._root` 참조가 직렬화되어 있다. 이번 분석에서는 실제 열차 생성·반환을 실행 검증하지 않았다.
 
 ---
 
 ## 6️⃣ 결론
 
-**현재 프로젝트 상태: ✅ 고급 수준의 디자인 패턴 적용**
+프로젝트의 핵심 구조는 **싱글톤 서비스, 소유자별 중앙 풀 레지스트리, 공용 Object Pool, 데이터 기반 행 생성, enum 기반 상태 관리**다. 생성 함수 주입, 생명주기 콜백과 Unity 컴포넌트 조합도 활용한다.
 
-이 프로젝트는 **실용적이고 효율적인 게임 아키텍처**를 보여줍니다:
-
-✅ **8가지 주요 디자인 패턴** 조화롭게 적용  
-✅ **성능 최적화** 최우선 (Object Pool + IPoolable)  
-✅ **중앙 집중식 풀 관리** (ObjectPoolManager)  
-✅ **확장성** 높음 (새 Generator 추가 용이)  
-✅ **타입 안전성** 최대한 보장  
-✅ **유니티 관례** 완벽히 준수  
+패턴 수나 별점으로 품질을 단정하기보다 풀 소유권, 재사용 초기화, 씬 전환 시 수명과 실제 플레이 동작을 확인하는 것이 중요하다.
 
 ### 추천 개선 순서
 
-**[🟢 선택사항]**
-1. CarMovement, LogMovement, LotusMovement에 OnGet에서 ResetState() 추가 (안정성 향상)
-2. 각 Generator/Manager의 주석에 사용된 패턴 명시 (문서화)
+**[🟠 우선 확인]**
+1. 원점에서 먼 행까지 포함해 열차 재사용 후 거리 판정을 테스트한다.
+2. Splash의 중복 `OnGet()` 호출이 의도된 동작인지 확인한다.
 
-**[🟡 향후 고려]**
-3. ObjectPoolManager.GetPool() 메서드 활용 증대
-4. 더 복잡한 프로젝트가 되면 간단한 DI 패턴 도입
+**[🟡 필요 시 검토]**
+3. 객체별 재사용 상태와 씬 전환 시 풀 수명을 점검한다.
+4. 풀 진단 정보와 의존성 분리는 실제 운영·테스트 필요에 따라 검토한다.
+5. 현재 구현의 GC 영향이 필요하면 같은 부하에서 Development Build를 재측정한다.
 
-**[🔵 불필요]**
-- 현재 구조로 충분하며, 무리해서 복잡도를 높일 필요 없음
-
----
-
-**최종 평가: ⭐⭐⭐⭐⭐ (5/5)**
-
-**디자인 패턴 성숙도: 고급 (Advanced)**  
-**생산성: 매우 높음**  
-**유지보수성: 매우 좋음**  
-**확장성: 우수함**  
+**[🔵 추가 패턴]**
+- 현재 코드만으로 새로운 GoF 패턴 도입이 필요하다고 단정하지 않는다.
 
 ---
 
-**분석 작성**: 2026-11-20 (최종 수정)  
-**프로젝트**: Crossy Road (Unity 6000.3.28f1)  
-**분석자**: Copilot AI Assistant
+- **분석 작성**: 2026-11-23
+- **프로젝트**: Crossy Road (Unity 6000.4.0f1)
+- **분석 기준**: 현재 작업 트리 정적 분석

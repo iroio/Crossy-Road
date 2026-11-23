@@ -3,6 +3,8 @@ using UnityEngine;
 
 public class MapGenerator : MonoBehaviour
 {
+    ObjectPoolManager _poolManager;
+
     [SerializeField] NatureGenerator _natureGenerator;
     [SerializeField] Transform _root;
 
@@ -20,14 +22,9 @@ public class MapGenerator : MonoBehaviour
     [SerializeField]  List<RowData> _rowDatas;
 
     const string _poolName = "Row";
-    readonly Dictionary<GameObject, GameObjectPool<RowObject>> _rowPools 
-        = new Dictionary<GameObject, GameObjectPool<RowObject>>();
-    
-    //fix: Track registered pools to avoid duplicate registration
-    readonly Dictionary<GameObject, bool> _registeredPools = new Dictionary<GameObject, bool>();
-
-    readonly Dictionary<GameObject, GameObject> _rowPrefabs 
-        = new Dictionary<GameObject, GameObject>();
+    readonly Dictionary<GameObject, string> _rowPoolKeys = new Dictionary<GameObject, string>();
+    // fix With AI
+    readonly Dictionary<GameObject, GameObject> _rowPrefabs = new Dictionary<GameObject, GameObject>();
 
     Transform _inactiveRowsRoot;
 
@@ -176,23 +173,21 @@ public class MapGenerator : MonoBehaviour
             _inactiveRowsRoot = root.transform;
         }
 
-        if (!_rowPools.TryGetValue(prefab, out GameObjectPool<RowObject> pool))
+        // fix With AI
+        if (_poolManager == null)
+            _poolManager = ObjectPoolManager.Instance;
+
+        if (!_rowPoolKeys.TryGetValue(prefab, out string poolKey))
         {
-            pool = new GameObjectPool<RowObject>(_inactiveRowsRoot, _initialSize,
+            var newPool = new GameObjectPool<RowObject>(_inactiveRowsRoot, _initialSize,
                 ()=> Instantiate(prefab, _inactiveRowsRoot).GetComponent<RowObject>());
-
-            _rowPools.Add(prefab, pool);
-
-            // fix with AI
-            // fix: Register row pool to Ob/ectPoolManager on first pool creation
-            if (!_registeredPools.ContainsKey(prefab))
-            {
-                string poolKey = $"Row{prefab.name}";
-                ObjectPoolManager.Instance.RegisterPool(poolKey, pool);
-                _registeredPools[prefab] = true;
-            }
+            // fix With AI
+            poolKey = $"{_poolName}:{_rowPoolKeys.Count}";
+            _poolManager.RegisterPool(this, poolKey, newPool);
+            _rowPoolKeys.Add(prefab, poolKey);
         }
 
+        GameObjectPool<RowObject> pool = _poolManager.GetPool<RowObject>(this, poolKey);
         RowObject row = pool.Get();
 
         _rowPrefabs[row.gameObject] = prefab;
@@ -208,6 +203,7 @@ public class MapGenerator : MonoBehaviour
         if (row == null || !_rowPrefabs.TryGetValue(row, out GameObject prefab)) return false;
         if (!row.activeSelf) return false;
 
+        GameObjectPool<RowObject> pool = _poolManager.GetPool<RowObject>(this, _rowPoolKeys[prefab]);
         foreach (NaturesReturn nature in row.GetComponentsInChildren<NaturesReturn>())
         {
             _natureGenerator.Removenature(nature);
@@ -216,8 +212,14 @@ public class MapGenerator : MonoBehaviour
         _rowPrefabs.Remove(row);
 
         row.transform.SetParent(_inactiveRowsRoot, false);
-        _rowPools[prefab].Return(row.GetComponent<RowObject>());
+        pool.Return(row.GetComponent<RowObject>());
 
         return true;
+    }
+
+    void OnDestroy()
+    {
+        if (_poolManager != null)
+            _poolManager.UnregisterPools(this);
     }
 }

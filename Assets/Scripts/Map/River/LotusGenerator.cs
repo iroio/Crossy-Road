@@ -3,6 +3,8 @@ using UnityEngine;
 
 public class LotusGenerator : MonoBehaviour
 {
+    ObjectPoolManager _poolManager;
+
     [SerializeField] Transform _root;
     [SerializeField] GameObject _lotus;
 
@@ -16,6 +18,7 @@ public class LotusGenerator : MonoBehaviour
 
     const string _poolName = "Lotus";
     GameObjectPool<LotusMovement> _lotusPools;
+
     List<int> _lotusPos = new List<int>();
 
     // =========================================================
@@ -23,7 +26,7 @@ public class LotusGenerator : MonoBehaviour
     // =========================================================
     public void SpawnLotus(float angle, int x)
     {
-        var lotus = _lotusPools.Get();
+        LotusMovement lotus = _lotusPools.Get();
 
         if (lotus == null) return;
 
@@ -84,17 +87,19 @@ public class LotusGenerator : MonoBehaviour
     // =========================================================
     void OnEnable()
     {
+        _poolManager = ObjectPoolManager.Instance;
         if (_lotusPools == null)
         {
-            _lotusPools = new GameObjectPool<LotusMovement>(_root, _initialSize, 
+            var pool = new GameObjectPool<LotusMovement>(_root, _initialSize,
                 ()=> 
                 {
                     return Instantiate(_lotus, _root).GetComponent<LotusMovement>();
                 },
                 lotus => lotus.InitLotus(this));
+            _poolManager.RegisterPool(this, _poolName, pool);
         }
 
-        ObjectPoolManager.Instance.RegisterPool(_poolName, _lotusPools);
+        _lotusPools = _poolManager.GetPool<LotusMovement>(this, _poolName);
 
         SpawnLotusGroup();
     }
@@ -108,5 +113,11 @@ public class LotusGenerator : MonoBehaviour
             if (lotus.gameObject.activeSelf)
                 RemoveLotus(lotus);
         }
+    }
+
+    private void OnDestroy()
+    {
+        if (_poolManager != null)
+            _poolManager.UnregisterPools(this);
     }
 }
